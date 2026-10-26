@@ -55,6 +55,25 @@ main{max-width:1100px;margin:0 auto;padding:20px}
 @media(max-width:820px){.grid2{grid-template-columns:1fr}}
 .addr{font-family:"IBM Plex Mono",monospace;font-size:13px;word-break:break-all;background:var(--surface);
   border:1px dashed var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.iconbtn{display:inline-flex;align-items:center;gap:6px}
+.info{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;padding:0;
+  border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--dim);
+  font:700 11px/1 "IBM Plex Mono",monospace;cursor:pointer;vertical-align:middle;margin-left:5px}
+.info:hover{color:var(--txt);border-color:var(--blue)}
+.modal{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
+  padding:18px;background:rgba(0,0,0,.78)}
+.modal[hidden]{display:none!important}
+.modalCard{position:relative;width:min(560px,96vw);max-height:90vh;overflow:auto;background:var(--panel);
+  border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:22px}
+.modalCard h3{margin:0 30px 12px 0;font-size:17px}
+.modalX{position:absolute;top:8px;right:10px;width:32px;height:32px;border-radius:9px;border:1px solid var(--line);
+  background:var(--surface);color:var(--txt);font-size:20px;line-height:1;cursor:pointer}
+.modalCard p,.modalCard li{font-size:12.5px;color:var(--dim);line-height:1.55}
+.modalCard ol{padding-left:18px;margin:10px 0}
+.modalCard li{margin:6px 0}
+.modalCard code{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--txt);word-break:break-all}
+.qrImg{display:block;width:240px;max-width:100%;margin:12px auto;padding:10px;background:#fff;border-radius:12px}
 .chart{padding:12px 14px}
 .chart svg{width:100%;height:210px}
 .scroll{overflow:auto;max-height:320px}
@@ -112,11 +131,9 @@ footer{max-width:1100px;margin:0 auto;padding:10px 20px 30px;color:var(--dim);fo
     <div class="kpis" id="kpis"></div>
 
     <section class="panel"><h2>Operaciones del fondo <span class="tag" id="opsTag"></span></h2>
-      <div class="pad muted small" id="opsNote"></div>
       <div class="scroll"><table id="opsT"><thead></thead><tbody></tbody></table></div></section>
 
     <section class="panel"><h2>Posiciones abiertas <span class="tag" id="openTag"></span></h2>
-      <div class="pad muted small" id="openNote"></div>
       <div class="scroll"><table id="openT"><thead></thead><tbody></tbody></table></div></section>
 
     <section class="panel"><h2>Mi evolución <span class="tag" id="eqTag"></span></h2><div class="chart" id="chart"></div></section>
@@ -124,9 +141,15 @@ footer{max-width:1100px;margin:0 auto;padding:10px 20px 30px;color:var(--dim);fo
     <div class="grid2">
       <section class="panel"><h2>Depositar</h2><div class="pad">
         <div class="addr" id="depAddr">—</div>
-        <button class="btn ghost" id="btnCopy" type="button">Copiar address</button>
-        <a class="btn ghost" id="depScan" href="#" target="_blank" rel="noopener" style="text-decoration:none">Ver en Polygonscan</a>
-        <div class="muted small" style="margin-top:10px">Envía <b>USDC.e (bridged) en Polygon</b> a esta dirección. Se acredita automáticamente al confirmarse (≈1 min). No envíes USDC nativo: no se detecta.</div>
+        <div class="actions">
+          <button class="btn ghost" id="btnCopy" type="button">Copiar address</button>
+          <button class="btn ghost iconbtn" id="btnQr" type="button" title="Ver QR de depósito">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM21 14v3M14 21h7"/></svg>
+            QR
+          </button>
+          <a class="btn ghost" id="depScan" href="#" target="_blank" rel="noopener" style="text-decoration:none">Ver en Polygonscan</a>
+        </div>
+        <div class="muted small" style="margin-top:10px">Envía <b>USDC.e (bridged) en Polygon</b> a esta dirección. Se acredita automáticamente al confirmarse (≈1 min). No envíes USDC nativo: no se detecta.<button class="info" id="btnUsdcInfo" type="button" title="Cómo comprar y bridgear USDC.e" aria-label="Cómo comprar y bridgear USDC.e">i</button></div>
       </div></section>
       <section class="panel"><h2>Retirar</h2><div class="pad">
         <input id="wAmount" type="number" min="0" step="0.01" placeholder="Importe (USD)">
@@ -146,6 +169,40 @@ footer{max-width:1100px;margin:0 auto;padding:10px 20px 30px;color:var(--dim);fo
     <section class="panel"><h2>Wallet de acceso</h2><div class="pad" id="walletBox"></div></section>
   </main>
   <footer>Umbrella Corp. FUND · datos del fondo en tiempo real. No es asesoramiento financiero.</footer>
+
+  <div id="qrModal" class="modal" hidden>
+    <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="qrTitle">
+      <button class="modalX" type="button" data-close="qrModal" aria-label="Cerrar">×</button>
+      <h3 id="qrTitle">Depositar USDC.e en Polygon</h3>
+      <img id="qrImg" class="qrImg" alt="QR de la dirección de depósito" referrerpolicy="no-referrer">
+      <div class="addr" id="qrAddr">—</div>
+      <div class="actions"><button class="btn ghost" id="qrCopy" type="button">Copiar address</button></div>
+      <p class="muted small">Escanea este QR desde tu wallet o exchange. Red: <b>Polygon PoS</b> · token: <b>USDC.e</b>.</p>
+    </div>
+  </div>
+
+  <div id="usdcModal" class="modal" hidden>
+    <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="usdcTitle">
+      <button class="modalX" type="button" data-close="usdcModal" aria-label="Cerrar">×</button>
+      <h3 id="usdcTitle">Cómo obtener USDC.e (Polygon)</h3>
+      <p>USDC.e es la versión <b>bridged</b> de USDC que usa Polymarket en Polygon. No es el USDC nativo de Circle.</p>
+      <ol>
+        <li>Compra USDC en tu exchange o wallet habitual.</li>
+        <li>Retíralo o envíalo a tu wallet en la red <b>Polygon PoS</b>. Si el exchange solo envía USDC nativo, tendrás que convertirlo a USDC.e.</li>
+        <li>Si tienes USDC en Ethereum u otra red, usa el <a href="https://portal.polygon.technology/bridge" target="_blank" rel="noopener">Polygon Bridge</a> para pasarlo a Polygon.</li>
+        <li>Si ya tienes USDC nativo en Polygon, haz swap a USDC.e en <a href="https://app.uniswap.org/swap?chain=polygon" target="_blank" rel="noopener">Uniswap</a> o en tu DEX habitual.</li>
+        <li>Envía el USDC.e a la dirección de depósito que te mostramos. No envíes USDC nativo: el contrato de depósito no lo detecta.</li>
+      </ol>
+      <p><b>USDC.e (bridged):</b><br><code>0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174</code></p>
+      <p><b>USDC nativo (no usar):</b><br><code>0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359</code></p>
+      <div class="actions">
+        <a class="btn ghost" href="https://portal.polygon.technology/bridge" target="_blank" rel="noopener">Polygon Bridge</a>
+        <a class="btn ghost" href="https://app.uniswap.org/swap?chain=polygon" target="_blank" rel="noopener">Uniswap Polygon</a>
+        <a class="btn ghost" href="https://polygonscan.com/token/0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174" target="_blank" rel="noopener">USDC.e en Polygonscan</a>
+      </div>
+      <p class="muted small">Verifica siempre la red y el contrato antes de enviar. Los envíos por la red equivocada o con el token equivocado pueden perderse.</p>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -277,16 +334,12 @@ function render(d){
   $("who").textContent=u.username||"";
   $("kpis").innerHTML =
     `<div class="kpi"><div class="lab">Aportado</div><div class="val">${money(a.aportado)}</div><div class="sub">${d.wallet?"wallet "+addr(d.wallet):"sin wallet vinculada"}</div></div>`+
-    `<div class="kpi"><div class="lab">Valor actual</div><div class="val">${money(a.valor)}</div><div class="sub">neto de comisión · ${a.units!=null?fmt(a.units,4)+" unidades":"—"}</div></div>`+
+    `<div class="kpi"><div class="lab">Valor actual</div><div class="val">${money(a.valor)}</div></div>`+
     `<div class="kpi"><div class="lab">Ganado</div><div class="val ${cls(a.ganado)}">${(a.ganado>0?"+":"")+money(a.ganado)}</div><div class="sub"><b class="${cls(a.roi)}">${pct(a.roi)}</b></div></div>`;
   const hist=d.history||[], share=+a.parte||0;
-  const ops=d.operations||[], open=d.open_positions||[];
-  const sharePct=a.share_pct!=null?+a.share_pct:share;
+  const ops=(d.operations||[]).slice(0,10), open=d.open_positions||[];
   const signed=v=>(v==null||isNaN(v))?"—":((v>0?"+":"")+money(v));
-  $("opsTag").textContent=ops.length?("· "+ops.length):"";
-  $("opsNote").innerHTML=`Importes según tu participación actual <b>${fmt(sharePct,2)}%</b>`+
-    (a.fund&&a.fund.pnl!=null?` · Fondo: ${money(a.fund.equity)} · aportado ${money(a.fund.aportado)} · PnL ${signed(a.fund.pnl)}`:"")+
-    ` · Las operaciones anteriores a tu entrada son históricas.`;
+  $("opsTag").textContent=ops.length?("· últimas "+ops.length):"";
   document.querySelector("#opsT thead").innerHTML=`<tr><th>Día</th><th>Ciudad</th><th>Entrada</th><th>Resultado</th><th class="r">Coste</th><th class="r">PnL</th><th class="r">ROI</th></tr>`;
   document.querySelector("#opsT tbody").innerHTML=ops.length?ops.map(x=>{
     const res=x.open?'<span class="pill">abierta</span>':x.pnl>0?'<span class="pill win">ganada</span>':x.pnl<0?'<span class="pill loss">perdida</span>':'<span class="pill">plana</span>';
@@ -295,7 +348,6 @@ function render(d){
       <td class="r ${cls(x.pnl)}">${signed(x.pnl)}</td><td class="r ${cls(x.roi)}">${pct(x.roi,1)}</td></tr>`;
   }).join(""):`<tr><td colspan="7" class="muted" style="padding:14px">sin operaciones cerradas del fondo</td></tr>`;
   $("openTag").textContent=open.length?("· "+open.length):"";
-  $("openNote").innerHTML=`Valores marcados a mercado · tu parte actual <b>${fmt(sharePct,2)}%</b>. Si la posición gana, el pago se calcula por las shares cubiertas.`;
   document.querySelector("#openT thead").innerHTML=`<tr><th>Día</th><th>Ciudad</th><th>Entrada</th><th class="r">Shares</th><th class="r">Coste</th><th class="r">Valor marcado</th><th class="r">PnL abierto</th><th class="r">Si gana</th></tr>`;
   document.querySelector("#openT tbody").innerHTML=open.length?open.map(x=>`
     <tr><td class="muted">${esc(String(x.day||"").slice(0,10))}</td><td>${esc(x.city_name||x.city||"—")}</td>
@@ -308,6 +360,12 @@ function render(d){
   $("depAddr").textContent=dep.address||"—";
   $("depAddr").title=dep.address||"";
   $("depScan").href = dep.address ? ("https://polygonscan.com/address/"+dep.address) : "#";
+  $("qrAddr").textContent=dep.address||"—";
+  if(dep.address){
+    $("qrImg").src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=10&data="+encodeURIComponent(dep.address);
+  } else {
+    $("qrImg").removeAttribute("src");
+  }
   if(!$("wTo").value && d.wallet) $("wTo").value=d.wallet;
   $("wAvail").innerHTML = (a.disponible!=null)
     ? `Disponible ahora: <b>${money(a.disponible)}</b> <span class="muted">(caja libre del fondo: ${money(a.free_cash)}; tu valor total: ${money(a.valor)})</span>`
@@ -353,11 +411,22 @@ async function bindWallet(){
   }catch(err){ alert("No se pudo vincular: "+(err.message||err)); }
 }
 
-$("btnCopy").addEventListener("click",async()=>{
-  try{ await navigator.clipboard.writeText($("depAddr").textContent); $("btnCopy").textContent="Copiada ✓";
-    setTimeout(()=>{$("btnCopy").textContent="Copiar address";},1500); }
-  catch(e){ alert($("depAddr").textContent); }
-});
+async function copyAddress(btn){
+  const text=$("depAddr").textContent||"";
+  try{ await navigator.clipboard.writeText(text); const old=btn.textContent; btn.textContent="Copiada ✓";
+    setTimeout(()=>{btn.textContent=old;},1500); }
+  catch(e){ alert(text); }
+}
+$("btnCopy").addEventListener("click",()=>copyAddress($("btnCopy")));
+$("qrCopy").addEventListener("click",()=>copyAddress($("qrCopy")));
+
+function openModal(id){ const m=$(id); if(!m) return; m.hidden=false; document.body.style.overflow="hidden"; }
+function closeModal(id){ const m=$(id); if(!m) return; m.hidden=true; if(!document.querySelector(".modal:not([hidden])")) document.body.style.overflow=""; }
+document.querySelectorAll("[data-close]").forEach(b=>b.addEventListener("click",()=>closeModal(b.dataset.close)));
+document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{ if(e.target===m) closeModal(m.id); }));
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") document.querySelectorAll(".modal:not([hidden])").forEach(m=>closeModal(m.id)); });
+$("btnQr").addEventListener("click",()=>openModal("qrModal"));
+$("btnUsdcInfo").addEventListener("click",()=>openModal("usdcModal"));
 
 $("btnWithdraw").addEventListener("click",async()=>{
   const amount=+$("wAmount").value||0, to=$("wTo").value.trim();
