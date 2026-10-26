@@ -378,7 +378,7 @@ function render(d){
     `<div class="kpi kpi-valor"><div class="lab">Valor actual</div><div class="val">${money(a.valor)}</div><div class="kpi-chart" id="chart"></div></div>`+
     `<div class="kpi"><div class="lab">Aportado</div><div class="val">${money(a.aportado)}</div><div class="sub">${d.wallet?"wallet "+addr(d.wallet):"sin wallet vinculada"}</div></div>`+
     `<div class="kpi"><div class="lab">Ganado</div><div class="val ${cls(a.ganado)}">${(a.ganado>0?"+":"")+money(a.ganado)}</div><div class="sub"><b class="${cls(a.roi)}">${pct(a.roi)}</b></div></div>`;
-  const hist=d.history||[], share=+a.parte||0, open=d.open_positions||[];
+  const hist=d.history||[], share=+a.parte||0, open=a.open_positions||d.open_positions||[];
   LAST=d;
   const signed=v=>(v==null||isNaN(v))?"—":((v>0?"+":"")+money(v));
   $("openTag").textContent=open.length?("· "+open.length):"";
@@ -434,7 +434,7 @@ function render(d){
 }
 
 function renderOps(){
-  const d=LAST||{}, a=d.account||{}, all=d.operations||[];
+  const d=LAST||{}, a=d.account||{}, all=a.operations||d.operations||[];
   const entry=String(a.entry_date||"");
   const mine=entry?all.filter(x=>String(x.day||"")>=entry):[];
   const list=(OPS_TAB==="mine"?mine:all).slice(0,15);
@@ -447,13 +447,16 @@ function renderOps(){
   $("opsEntryNote").innerHTML=OPS_TAB==="mine"
     ? (entry?`Participas en las operaciones desde <b>${esc(entry)}</b>.`:"Aún no tienes una fecha de ingreso registrada.")
     : "Últimas 15 operaciones del fondo.";
-  document.querySelector("#opsT thead").innerHTML=`<tr><th>Día</th><th>Ciudad</th><th>Entrada</th><th>Resultado</th><th class="r">Coste</th><th class="r">PnL</th><th class="r">ROI</th></tr>`;
+  const fundTab=OPS_TAB==="fund";
+  document.querySelector("#opsT thead").innerHTML=`<tr><th>Día</th><th>Ciudad</th><th>Entrada</th><th>Ganó</th><th>Resultado</th><th class="r">Coste</th><th class="r">PnL</th><th class="r">ROI</th></tr>`;
   document.querySelector("#opsT tbody").innerHTML=list.length?list.map(x=>{
-    const res=x.open?'<span class="pill">abierta</span>':x.pnl>0?'<span class="pill win">ganada</span>':x.pnl<0?'<span class="pill loss">perdida</span>':'<span class="pill">plana</span>';
+    const cost=fundTab?x.cost_fund:x.cost;
+    const pnl=fundTab?x.pnl_fund:x.pnl;
+    const res=x.open?'<span class="pill">abierta</span>':pnl>0?'<span class="pill win">ganada</span>':pnl<0?'<span class="pill loss">perdida</span>':'<span class="pill">plana</span>';
     return `<tr><td class="muted">${esc(String(x.day||"").slice(0,10))}</td><td>${esc(x.city_name||x.city||"—")}</td>
-      <td>${esc(x.entry||"—")}</td><td>${res}</td><td class="r">${money(x.cost)}</td>
-      <td class="r ${cls(x.pnl)}">${signed(x.pnl)}</td><td class="r ${cls(x.roi)}">${pct(x.roi,1)}</td></tr>`;
-  }).join(""):`<tr><td colspan="7" class="muted" style="padding:14px">${OPS_TAB==="mine"?"aún no hay operaciones desde tu ingreso":"sin operaciones del fondo"}</td></tr>`;
+      <td>${esc(x.entry||"—")}</td><td>${esc(x.winner||"—")}</td><td>${res}</td><td class="r">${money(cost)}</td>
+      <td class="r ${cls(pnl)}">${signed(pnl)}</td><td class="r ${cls(x.roi)}">${pct(x.roi,1)}</td></tr>`;
+  }).join(""):`<tr><td colspan="8" class="muted" style="padding:14px">${OPS_TAB==="mine"?"aún no hay operaciones desde tu ingreso":"sin operaciones del fondo"}</td></tr>`;
 }
 
 async function bindWallet(){
