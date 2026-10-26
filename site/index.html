@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Umbrella Corp. · FUND</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f5f7;--panel:#fff;--panel2:#fbfbfd;--line:#e3e3e8;--txt:#1d1d1f;--dim:#6e6e73;
+  --green:#1a9e4b;--red:#d70015;--blue:#0071e3;--amber:#b25000;--violet:#6e56cf;
+  --shadow:0 1px 2px rgba(0,0,0,.04),0 10px 30px rgba(0,0,0,.05);
+  --surface:#fff;--rowline:#f0f0f2;--rowhover:#fafafa;--headerbg:rgba(255,255,255,.85);--logo:#1d1d1f;--ongreen:#bfe3c8;
+  --wintint:rgba(26,158,75,.07);
+}
+html[data-theme="dark"]{
+  --bg:#06090c;--panel:#0e1319;--panel2:#0a0e13;--line:#1e2730;--txt:#d5e0ea;--dim:#7383a0;
+  --green:#26d07c;--red:#ff5c5c;--blue:#39a7ff;--amber:#ff9e2c;--violet:#b388ff;
+  --shadow:0 0 0 1px rgba(255,255,255,.02),0 10px 30px rgba(0,0,0,.55);
+  --surface:#141a21;--rowline:#161d25;--rowhover:#10151c;--headerbg:rgba(6,9,12,.92);--logo:#ff9e2c;--ongreen:#1f5c40;
+  --wintint:rgba(38,208,124,.09);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);min-height:100vh;
+  font:14px/1.5 "Jost",-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",Roboto,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+html[data-theme="dark"] body{font-family:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:13px}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 22px;border-bottom:1px solid var(--line);
+  background:var(--headerbg);backdrop-filter:saturate(180%) blur(20px);position:sticky;top:0;z-index:5}
+.brand{display:flex;align-items:center;gap:11px}
+.brand .logo{color:var(--logo)}
+.brand .btxt{font-weight:700;font-size:15px;letter-spacing:-.3px;line-height:1.15}
+.brand .btxt span{display:block;color:var(--dim);font-weight:500;font-size:10.5px;letter-spacing:.3px;margin-top:3px}
+h1{font-size:15px;margin:0;font-weight:600;color:var(--amber);text-transform:uppercase;letter-spacing:.6px}
+.badge{font-size:10.5px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--dim);
+  text-transform:uppercase;letter-spacing:.5px;background:var(--surface)}
+.badge.on{color:var(--green);border-color:var(--ongreen)}
+.badge.warn{color:var(--amber);border-color:#f0d9b5}
+main{padding:22px;max-width:1440px;width:100%;margin:0 auto}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:18px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow)}
+html[data-theme="dark"] .kpi{background:linear-gradient(180deg,#121820,#0e1319)}
+.kpi .lab{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.kpi .val{font-size:26px;font-weight:700;letter-spacing:-.5px;line-height:1.1;
+  font-family:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.kpi .sub{font-size:11.5px;color:var(--dim);margin-top:6px}
+.kpi.win{border-color:var(--ongreen);background:var(--wintint)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;margin-bottom:18px;overflow:hidden;box-shadow:var(--shadow)}
+.panel h2{font-size:13.5px;margin:0;padding:14px 18px;border-bottom:1px solid var(--line);font-weight:650}
+html[data-theme="dark"] .panel h2{color:var(--amber);text-transform:uppercase;letter-spacing:.9px;font-size:11.5px}
+.panel h2 .tag{font-weight:500;color:var(--dim);font-size:11.5px;margin-left:6px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--dim);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.5px;
+  padding:10px 14px;border-bottom:1px solid var(--line);background:var(--panel2)}
+html[data-theme="dark"] th{background:#0b0f14;color:var(--amber)}
+td{padding:9px 14px;border-bottom:1px solid var(--rowline);vertical-align:top}
+tr:hover td{background:var(--rowhover)}
+tr.win td{background:var(--wintint)}
+tr.win:hover td{background:rgba(38,208,124,.14)}
+.pos{color:var(--green)}.neg{color:var(--red)}.flat{color:var(--dim)}.muted{color:var(--dim)}
+.r{text-align:right}.nowrap{white-space:nowrap}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
+.pill{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--dim);
+  font-size:10.5px;background:var(--surface)}
+.pill.win{color:var(--green);border-color:var(--ongreen);background:var(--wintint);font-weight:700}
+.pill.loss{color:var(--red);border-color:#e0a0a0;background:rgba(215,0,21,.06);font-weight:700}
+.labs{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;padding:16px 18px}
+.lcard{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--panel)}
+.lcard .nm{font-weight:650;display:flex;align-items:center;gap:8px;font-size:14px}
+.lcard .big{font-size:24px;font-weight:700;letter-spacing:-.4px;margin:8px 0 4px;
+  font-family:"IBM Plex Mono",ui-monospace,monospace}
+.lcard .r{font-size:12px;color:var(--dim)}
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:12px;padding:16px 18px}
+.box{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--panel)}
+.box.open{border-color:var(--ongreen);background:var(--wintint)}
+.box .t{font-weight:600;font-size:13.5px;display:flex;justify-content:space-between;align-items:center;gap:6px}
+.box .p{font-size:22px;font-weight:700;letter-spacing:-.5px;margin:7px 0 2px;font-family:"IBM Plex Mono",ui-monospace,monospace}
+.box .s{font-size:11px;color:var(--dim)}
+.box .held{margin-top:8px;font-size:11px;border-top:1px solid var(--line);padding-top:6px;color:var(--dim)}
+.box .clock{font-family:"IBM Plex Mono",ui-monospace,monospace;color:var(--txt);font-weight:600;letter-spacing:.3px}
+.pill.open{color:var(--green);border-color:var(--ongreen);background:var(--wintint);font-weight:700}
+.pill.window{color:var(--amber);border-color:#f0d9b5;font-weight:700}
+.pad{padding:16px 18px}
+.scroll{overflow:auto;max-height:580px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:1000px){.grid2{grid-template-columns:1fr}}
+.chart{padding:10px 14px 14px}
+.chart svg{width:100%;height:auto;display:block}
+#wlChart{display:flex;align-items:center;justify-content:center;padding:14px}
+#wlChart svg{width:100%;max-width:180px;height:auto}
+footer{padding:10px 22px 26px;color:var(--dim);font-size:11.5px;max-width:1440px;margin:0 auto}
+button.btn{background:var(--blue);color:#fff;border:0;border-radius:9px;padding:7px 14px;font:inherit;font-size:12.5px;cursor:pointer}
+button.btn.ghost{background:var(--surface);border:1px solid var(--line);color:var(--txt)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.seg button{background:transparent;color:var(--dim);border:0;padding:6px 13px;font:inherit;font-size:10.5px;cursor:pointer;letter-spacing:.6px;text-transform:uppercase}
+.seg button.active{background:var(--blue);color:#fff}
+#gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center}
+#gate .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:30px 34px;
+  box-shadow:var(--shadow);width:min(360px,92vw);text-align:center}
+#gate .ico{color:var(--logo);line-height:0;margin-bottom:8px}
+#gate .lt{font-size:22px;letter-spacing:3px;font-weight:700;color:var(--logo)}
+#gate .st{color:var(--dim);font-size:11.5px;margin:6px 0 18px;text-transform:uppercase;letter-spacing:.6px}
+#gate input{width:100%;text-align:center;letter-spacing:6px;font-size:20px;padding:11px;border-radius:10px;
+  border:1px solid var(--line);background:var(--surface);color:var(--txt);font-family:"IBM Plex Mono",monospace}
+#gate button{margin-top:12px;width:100%}
+#gate .err{color:var(--red);font-size:12px;min-height:16px;margin-top:8px}
+body.locked > header, body.locked > main, body.locked > footer{display:none}
+</style>
+</head>
+<body class="locked">
+<div id="gate">
+  <div class="card">
+    <div class="ico">
+      <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 3.2a8.8 8.8 0 0 1 8.8 8.8H3.2A8.8 8.8 0 0 1 12 3.2Z"/>
+        <path d="M12 3.2V2.1"/>
+        <path d="M12 12v6.9a2.2 2.2 0 0 0 4.4 0"/>
+      </svg>
+    </div>
+    <div class="lt">UMBRELLA CORP.</div>
+    <div class="st">FUND · acceso restringido</div>
+    <input id="pin" type="password" inputmode="numeric" maxlength="6" placeholder="••••••" autocomplete="off">
+    <button class="btn" id="go">Entrar</button>
+    <div class="err" id="err"></div>
+  </div>
+</div>
+
+<header>
+  <div class="brand">
+    <span class="logo">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 3.2a8.8 8.8 0 0 1 8.8 8.8H3.2A8.8 8.8 0 0 1 12 3.2Z"/>
+        <path d="M12 3.2V2.1"/>
+        <path d="M12 12v6.9a2.2 2.2 0 0 0 4.4 0"/>
+      </svg>
+    </span>
+    <div class="btxt">Umbrella Corp.<span>FUND</span></div>
+  </div>
+  <h1 id="title">FUND</h1>
+  <div class="seg" id="modeSwitch">
+    <button data-mode="live" class="active">LIVE</button>
+    <button data-mode="backtest">BACKTEST</button>
+  </div>
+  <span class="badge" id="upd">datos de las: —</span>
+  <span class="badge" id="dataTs">publicado: —</span>
+  <span style="margin-left:auto"></span>
+  <a class="btn" href="app.html" style="text-decoration:none">Mi cuenta</a>
+  <button class="btn ghost" id="refresh">Actualizar</button>
+  <button class="btn ghost" id="theme" title="Tema">☾</button>
+</header>
+
+<main>
+  <div class="kpis" id="kpis"></div>
+
+  <section class="panel" id="cityStatePanel">
+    <h2>Ciudades · estado <span class="tag" id="cityStateTag"></span></h2>
+    <div class="pad muted" style="font-size:11.5px;border-bottom:1px solid var(--line)">
+      Estado en la <b>hora local</b> de cada ciudad: <b>esperando ventana</b> (antes de 14:30),
+      <b>en ventana</b> (14:30–15:30), <b>post-pico</b> (después) o <b>posición abierta</b>.
+      El favorito es el cubo con mayor precio; entra si está en la banda [0,86, 0,95].
+    </div>
+    <div class="board" id="cityBoard"></div>
+  </section>
+
+  <section class="panel" id="posPanel">
+    <h2>Posiciones abiertas <span class="tag" id="posTag"></span></h2>
+    <div class="scroll"><table id="posTable"><thead></thead><tbody></tbody></table></div>
+  </section>
+
+  <section class="panel"><h2>Evolución de la cartera <span class="tag" id="eqTag"></span></h2><div class="chart" id="equityChart"></div></section>
+
+  <div class="grid2">
+    <section class="panel"><h2>PnL por mes</h2><div class="chart" id="monthChart"></div></section>
+    <section class="panel"><h2>PnL por ciudad</h2><div class="chart" id="cityChart"></div></section>
+  </div>
+
+  <div class="grid2">
+    <section class="panel"><h2>Por estrategia</h2><div class="labs" id="labs"></div></section>
+    <section class="panel"><h2>Acierto <span class="tag" id="wlTag"></span></h2><div class="chart" id="wlChart"></div></section>
+  </div>
+
+  <section class="panel">
+    <h2>Operaciones cerradas <span class="tag" id="opsTag"></span></h2>
+    <div class="scroll"><table id="opsTable"><thead></thead><tbody></tbody></table></div>
+  </section>
+
+  <section class="panel" id="cityPanel">
+    <h2>Ciudades · live <span class="tag" id="cityTableTag"></span></h2>
+    <div class="scroll"><table id="cityTable"><thead></thead><tbody></tbody></table></div>
+  </section>
+</main>
+<footer>
+  Umbrella Corp. FUND · datos del bot (paper). Interfaz informativa, sin operativa.
+  LIVE se actualiza cada 5 min; BACKTEST es un histórico estático.
+</footer>
+
+<script>
+const GIST_ID = "e4c1d3c615df744c0f0fac8b4b67742f";
+const GIST_USER = "datak0w";
+const GIST_FILE = "fund.json";
+const API = `https://api.github.com/gists/${GIST_ID}`;
+const RAW = `https://gist.githubusercontent.com/${GIST_USER}/${GIST_ID}/raw/${GIST_FILE}`;
+const PIN = "171819";
+const POLL_MS = 5 * 60 * 1000;
+let MODE = "live";
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = (v,d=2) => (v===null||v===undefined||isNaN(v)) ? "—" : Number(v).toLocaleString("es-ES",{minimumFractionDigits:d,maximumFractionDigits:d});
+const money = (v,d=2) => (v===null||v===undefined||isNaN(v)) ? "—" : fmt(v,d)+" $";
+const pct = (v,d=1) => (v===null||v===undefined||isNaN(v)) ? "—" : ((v>0?"+":"")+fmt(v,d)+"%");
+const cls = v => (v===null||v===undefined||v===0) ? "flat" : (v>0?"pos":"neg");
+const short = d => String(d||"").slice(5);
+function fmtClock(tz){
+  try{ return new Intl.DateTimeFormat("es-ES",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false,timeZone:tz}).format(new Date()); }
+  catch(e){ return new Date().toLocaleTimeString("es-ES",{hour12:false}); }
+}
+function tickClocks(){
+  document.querySelectorAll("span.clock").forEach(el=>{ el.textContent = fmtClock(el.dataset.tz); });
+}
+
+function applyTheme(t){ document.documentElement.dataset.theme=t; $("theme").textContent = t==="dark"?"☾":"☀"; }
+try{ applyTheme(localStorage.getItem("fund_theme")||"dark"); }catch(e){ applyTheme("dark"); }
+$("theme").addEventListener("click",()=>{ const t=document.documentElement.dataset.theme==="dark"?"light":"dark";
+  try{localStorage.setItem("fund_theme",t);}catch(e){} applyTheme(t); });
+
+function reveal(){ document.body.classList.remove("locked"); $("gate").style.display="none"; load(); }
+function tryPin(){
+  if($("pin").value.trim() === PIN){ try{sessionStorage.setItem("fund_ok","1");}catch(e){} reveal(); }
+  else { $("err").textContent="PIN incorrecto"; $("pin").value=""; }
+}
+$("go").addEventListener("click",tryPin);
+$("pin").addEventListener("keydown",e=>{ if(e.key==="Enter") tryPin(); });
+try{ if(sessionStorage.getItem("fund_ok")==="1") reveal(); }catch(e){}
+
+async function fetchSnapshot(){
+  if(MODE === "backtest"){
+    const r = await fetch("./backtest.json?t="+Date.now(), {cache:"no-store"});
+    if(!r.ok) throw new Error("backtest "+r.status);
+    return await r.json();
+  }
+  try{
+    const r = await fetch(API, {headers:{Accept:"application/vnd.github+json"}, cache:"no-store"});
+    if(!r.ok) throw new Error("api "+r.status);
+    const g = await r.json();
+    const f = g.files && g.files[GIST_FILE];
+    if(!f || !f.content) throw new Error("sin contenido");
+    const snap = JSON.parse(f.content);
+    try{ localStorage.setItem("fund_snap", f.content); }catch(e){}
+    return snap;
+  }catch(err){
+    try{ const c=localStorage.getItem("fund_snap"); if(c) return JSON.parse(c); }catch(e){}
+    try{ const r=await fetch(RAW+"?t="+Date.now(),{cache:"no-store"}); if(r.ok){ const s=await r.json();
+      try{localStorage.setItem("fund_snap",JSON.stringify(s));}catch(e){} return s; } }catch(e){}
+    throw err;
+  }
+}
+
+/* ---------- SVG charts ---------- */
+const C = { green:"var(--green)", red:"var(--red)", blue:"var(--blue)", dim:"var(--dim)", line:"var(--line)", txt:"var(--txt)" };
+function lineChart(points){
+  if(!points || points.length < 2) return `<div class="pad muted">aún no hay suficientes días</div>`;
+  const W=1000,H=190,P=42;
+  const ys=points.map(p=>p.y);
+  let min=Math.min(...ys), max=Math.max(...ys); if(min===max){min-=1;max+=1;}
+  const pad=(max-min)*0.12; min-=pad; max+=pad;
+  const X=i=>P+(W-2*P)*i/(points.length-1);
+  const Y=v=>H-P-(H-2*P)*(v-min)/(max-min);
+  const line=points.map((p,i)=>`${X(i).toFixed(1)},${Y(p.y).toFixed(1)}`).join(" ");
+  const area=`${X(0).toFixed(1)},${H-P} ${line} ${X(points.length-1).toFixed(1)},${H-P}`;
+  const up=points[points.length-1].y >= points[0].y;
+  const col=up?C.green:C.red;
+  let g="";
+  for(let i=0;i<=4;i++){ const v=min+(max-min)*i/4, y=Y(v);
+    g+=`<line x1="${P}" y1="${y}" x2="${W-P}" y2="${y}" stroke="${C.line}" stroke-dasharray="3 5"/>`+
+       `<text x="${P-8}" y="${y+3}" text-anchor="end" font-size="10" fill="${C.dim}">${fmt(v,0)}</text>`; }
+  let ticks="";
+  points.forEach((p,i)=>{ if(points.length>8 && i%Math.ceil(points.length/8)!==0 && i!==points.length-1) return;
+    ticks+=`<text x="${X(i)}" y="${H-P+16}" text-anchor="middle" font-size="10" fill="${C.dim}">${esc(short(p.x))}</text>`; });
+  const dots=points.map((p,i)=>`<circle cx="${X(i)}" cy="${Y(p.y)}" r="2.6" fill="${col}"/>`).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img">
+    <defs><linearGradient id="eqfill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${col}" stop-opacity=".28"/><stop offset="100%" stop-color="${col}" stop-opacity="0"/>
+    </linearGradient></defs>
+    ${g}<polygon points="${area}" fill="url(#eqfill)"/>
+    <polyline points="${line}" fill="none" stroke="${col}" stroke-width="2.4" stroke-linejoin="round"/>${dots}${ticks}
+  </svg>`;
+}
+function barChart(items, valKey="value", labelKey="label"){
+  if(!items || !items.length) return `<div class="pad muted">sin datos</div>`;
+  const W=1000,H=175,P=42; const base=H-P;
+  const vals=items.map(i=>+i[valKey]||0);
+  const max=Math.max(1, ...vals.map(v=>Math.abs(v)));
+  const bw=(W-2*P)/items.length;
+  let bars="", labels="";
+  items.forEach((it,i)=>{
+    const v=+it[valKey]||0; const h=(H-2*P)*Math.abs(v)/max;
+    const x=P+bw*i+bw*0.18, w=bw*0.64;
+    const y=v>=0?base-h:base;
+    const col=v>=0?C.green:C.red;
+    bars+=`<rect x="${x}" y="${y}" width="${w}" height="${Math.max(1,h)}" rx="4" fill="${col}" opacity=".9"/>`;
+    if(items.length<=14 || i%Math.ceil(items.length/12)===0)
+      labels+=`<text x="${x+w/2}" y="${base+16}" text-anchor="middle" font-size="10" fill="${C.dim}">${esc(it[labelKey])}</text>`;
+    if(Math.abs(v)>0) bars+=`<text x="${x+w/2}" y="${v>=0?y-5:y+h+13}" text-anchor="middle" font-size="10" fill="${col}">${fmt(v,0)}</text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" role="img">
+    <line x1="${P}" y1="${base}" x2="${W-P}" y2="${base}" stroke="${C.line}"/>${bars}${labels}</svg>`;
+}
+function winLossChart(wins, losses){
+  const total=(+wins||0)+(+losses||0);
+  if(!total) return `<div class="pad muted">sin operaciones resueltas</div>`;
+  const frac=(+wins||0)/total, R=54, cx=124, cy=92, sw=22;
+  const circ=2*Math.PI*R;
+  return `<svg viewBox="0 0 270 190" role="img">
+    <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${C.red}" stroke-width="${sw}" opacity=".85"/>
+    <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${C.green}" stroke-width="${sw}"
+      stroke-dasharray="${(circ*frac).toFixed(1)} ${circ.toFixed(1)}" transform="rotate(-90 ${cx} ${cy})" stroke-linecap="butt"/>
+    <text x="${cx}" y="${cy-2}" text-anchor="middle" font-size="26" font-weight="700" fill="${C.green}">${fmt(frac*100,0)}%</text>
+    <text x="${cx}" y="${cy+18}" text-anchor="middle" font-size="10" fill="${C.dim}">acierto</text>
+    <text x="210" y="72" text-anchor="middle" font-size="15" font-weight="700" fill="${C.green}">${wins||0}</text>
+    <text x="210" y="88" text-anchor="middle" font-size="10" fill="${C.dim}">ganadas</text>
+    <text x="210" y="122" text-anchor="middle" font-size="15" font-weight="700" fill="${C.red}">${losses||0}</text>
+    <text x="210" y="138" text-anchor="middle" font-size="10" fill="${C.dim}">perdidas</text>
+  </svg>`;
+}
+
+/* ---------- render ---------- */
+function kpi(lab,val,sub,cl,extra){
+  return `<div class="kpi ${extra||""}"><div class="lab">${esc(lab)}</div><div class="val ${cl||""}">${val}</div><div class="sub">${sub||""}</div></div>`;
+}
+
+function render(s){
+  const t = s.totals || {};
+  const isBt = (s.source === "backtest");
+  $("title").textContent = "FUND";
+  $("posPanel").hidden = isBt;
+  $("cityPanel").hidden = isBt;
+  $("cityStatePanel").hidden = isBt;
+  const gen = s.generated_at ? new Date(s.generated_at) : null;
+  const genLocal = gen ? gen.toLocaleString("es-ES",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false}) : "—";
+  const dts = s.data_ts ? new Date(s.data_ts) : null;
+  const dAge = dts ? (Date.now()-dts.getTime())/60000 : null;
+  const dLocal = dts ? dts.toLocaleString("es-ES",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false}) : "—";
+  const dAgo = dAge==null ? "" : (dAge < 1 ? "hace <1 min" : `hace ${Math.round(dAge)} min`);
+  $("upd").textContent = `datos de las ${dLocal} · ${dAgo}`;
+  $("upd").className = "badge " + (dAge==null ? "" : (dAge>20 ? "warn" : "on"));
+  $("dataTs").textContent = "publicado " + genLocal;
+
+  const roiDaily = t.days ? (t.roi_pct||0)/t.days : 0;
+  const pnlDaily = t.days ? (t.pnl||0)/t.days : 0;
+  $("kpis").innerHTML =
+    kpi("PnL total", (t.pnl>0?"+":"")+money(t.pnl),
+        `ROI cartera ${pct(t.roi_pct)} · <b class="pos">${pct(roiDaily,2)}/día</b> · ${money(pnlDaily)}/día · ${t.days||0} días`, cls(t.pnl)) +
+    kpi("Acierto", fmt(t.win_rate,0)+"%", `<b class="pos">${t.wins||0} ganadas</b> · ${t.losses||0} perdidas`, "pos", "win") +
+    kpi("Operado (total)", money(t.staked,0), `media ${money(t.avg_stake,0)}/op · máx ${money(t.max_stake,0)}`) +
+    kpi("Cartera mínima", money(t.min_equity,0), `peor punto · DD máx ${money(t.max_drawdown,0)}`) +
+    kpi("Capital configurado", money(t.capital,0), `${(s.labs||[]).length} estrategias`) +
+    kpi("En juego", money(t.open_stake), `${(s.positions||[]).length} posición(es) · valor ${money(t.open_value)}`, cls(t.open_unrealized)) +
+    kpi("Operaciones", t.ops||0, `${t.wins||0}G / ${t.losses||0}P`);
+
+  const eq = s.equity || [];
+  $("eqTag").textContent = eq.length ? `· ${eq.length} días` : "";
+  $("equityChart").innerHTML = lineChart(eq.map(e=>({x:e.day, y:+e.equity})));
+
+  $("monthChart").innerHTML = barChart((s.monthly||[]).map(m=>({label:m.month, value:m.pnl})), "value", "label");
+  $("cityChart").innerHTML = barChart((s.per_city||[]).slice(0,12).map(c=>({label:(c.name||c.city), value:c.pnl})), "value", "label");
+
+  const labs = s.labs || [];
+  $("labs").innerHTML = labs.length ? labs.map(l=>`
+    <div class="lcard">
+      <div class="nm"><span class="dot" style="background:${esc(l.color||"#4ea1ff")}"></span>${esc(l.name||l.id)}</div>
+      <div class="big ${cls(l.pnl)}">${(l.pnl>0?"+":"")+money(l.pnl)}</div>
+      <div class="r"><b class="pos">${l.wins||0}G</b> / ${l.losses||0}P · acierto ${fmt(l.win_rate,0)}%</div>
+      <div class="r">ROI ${pct(l.roi_pct)} · ${l.ops||0} op · en juego ${money(l.open_stake)}</div>
+      <div class="r"><b>${l.days||0} días</b> · <b class="pos">${pct(l.roi_daily ?? (l.roi_pct/(l.days||1)),2)}/día</b> · ${money(l.pnl_daily ?? (l.pnl/(l.days||1)))}/día</div>
+    </div>`).join("") : `<div class="pad muted">sin datos</div>`;
+
+  $("wlTag").textContent = `${t.wins||0}G / ${t.losses||0}P`;
+  $("wlChart").innerHTML = winLossChart(t.wins, t.losses);
+
+  const ops = s.operations || [];
+  $("opsTag").textContent = ops.length ? `· ${ops.length}` : "";
+  document.querySelector("#opsTable thead").innerHTML =
+    `<tr><th>Resultado</th><th>Día</th><th>Ciudad</th><th>Estrategia</th><th class="r">Apostado</th><th class="r">PnL</th><th class="r">ROI</th></tr>`;
+  document.querySelector("#opsTable tbody").innerHTML = ops.length ? ops.map(o=>`
+    <tr class="${o.won?'win':''}"><td>${o.won?'<span class="pill win">GANADA</span>':'<span class="pill loss">PERDIDA</span>'}</td>
+      <td class="muted nowrap">${esc(o.day)}</td><td>${esc(o.city_name||o.city)}</td>
+      <td><span class="dot" style="background:${esc(o.color||"#4ea1ff")}"></span>${esc(o.lab_name||o.lab)}</td>
+      <td class="r">${money(o.cost)}</td>
+      <td class="r ${cls(o.pnl)}"><b>${(o.pnl>0?"+":"")+money(o.pnl)}</b></td>
+      <td class="r ${cls(o.roi_pct)}">${pct(o.roi_pct)}</td></tr>`).join("")
+    : `<tr><td colspan="7" class="muted" style="padding:14px">sin operaciones cerradas</td></tr>`;
+
+  const pos = s.positions || [];
+  $("posTag").textContent = pos.length ? `· ${pos.length}` : "";
+  document.querySelector("#posTable thead").innerHTML =
+    `<tr><th>Estrategia</th><th>Ciudad</th><th>Cubo</th><th class="r">Acciones</th><th class="r">Compra</th><th class="r">Actual</th><th class="r">Invertido</th><th class="r">Valor</th><th class="r">PnL esperado</th><th class="r">No realizado</th></tr>`;
+  document.querySelector("#posTable tbody").innerHTML = pos.length ? pos.map(p=>{
+    const exp = (+p.shares||0) - (+p.stake||0);
+    return `<tr><td><span class="dot" style="background:${esc(p.color||"#4ea1ff")}"></span>${esc(p.lab_name||p.lab)}</td>
+      <td>${esc(p.city||"—")}</td><td>${esc(p.bucket||"—")}</td>
+      <td class="r">${fmt(p.shares,1)}</td><td class="r">${fmt(p.avg_price,3)}</td>
+      <td class="r">${p.mark!=null?fmt(p.mark,3):"—"}</td><td class="r">${money(p.stake)}</td>
+      <td class="r">${money(p.value)}</td>
+      <td class="r ${cls(exp)}">${(exp>0?"+":"")+money(exp)}</td>
+      <td class="r ${cls(p.unrealized)}">${p.unrealized!=null?(p.unrealized>0?"+":"")+money(p.unrealized):"—"}</td></tr>`;
+  }).join("")
+    : `<tr><td colspan="10" class="muted" style="padding:14px">sin posiciones abiertas</td></tr>`;
+
+  const cities = s.cities || [];
+  $("cityStateTag").textContent = cities.length ? `· ${cities.length}` : "";
+  const boardEl = $("cityBoard");
+  if(boardEl){
+    boardEl.innerHTML = cities.length ? cities.map(c=>{
+      let status = "post-pico", cls = "";
+      if((c.positions||0) > 0){ status = "posición abierta"; cls = "open"; }
+      else if(!c.day || (c.local_date && c.day !== c.local_date)){ status = "sin mercado"; cls = ""; }
+      else if(c.phase === "pre"){ status = "esperando ventana"; cls = ""; }
+      else if(c.phase === "window"){ status = "en ventana"; cls = "window"; }
+      return `<div class="box ${cls==='open'?'open':''}">
+        <div class="t">${esc(c.name||c.slug)}<span class="pill ${cls}">${status}</span></div>
+        <div class="p">${esc(c.favorite||"—")}</div>
+        <div class="s">ask ${c.fav_ask!=null?fmt(c.fav_ask,3):"—"} · suma3 ${c.sum3!=null?fmt(c.sum3,3):"—"}</div>
+        <div class="held"><span class="clock" data-tz="${esc(c.tz||"UTC")}">${esc(c.local_time||"--:--")}</span> local · ${c.positions||0} pos.</div>
+      </div>`;
+    }).join("") : `<div class="pad muted">sin datos</div>`;
+  }
+  $("cityTableTag").textContent = cities.length ? `· ${cities.length}` : "";
+  document.querySelector("#cityTable thead").innerHTML =
+    `<tr><th>Ciudad</th><th>Día</th><th>Favorito</th><th class="r">Ask</th><th class="r">Suma top3</th><th class="r">Posiciones</th></tr>`;
+  document.querySelector("#cityTable tbody").innerHTML = cities.length ? cities.map(c=>`
+    <tr><td>${esc(c.name||c.slug)}</td><td class="muted nowrap">${esc(c.day||"—")}</td>
+      <td>${esc(c.favorite||"—")}</td><td class="r">${c.fav_ask!=null?fmt(c.fav_ask,3):"—"}</td>
+      <td class="r">${c.sum3!=null?fmt(c.sum3,3):"—"}</td><td class="r">${c.positions||0}</td></tr>`).join("")
+    : `<tr><td colspan="6" class="muted" style="padding:14px">sin datos</td></tr>`;
+}
+
+async function load(){
+  try{ render(await fetchSnapshot()); }
+  catch(err){ $("upd").textContent="no se pudo cargar el snapshot"; $("upd").className="badge warn"; console.error(err); }
+}
+$("refresh").addEventListener("click", load);
+document.querySelectorAll("#modeSwitch button").forEach(b=>b.addEventListener("click",()=>{
+  MODE = b.dataset.mode;
+  document.querySelectorAll("#modeSwitch button").forEach(x=>x.classList.toggle("active", x===b));
+  load();
+}));
+setInterval(load, POLL_MS);
+setInterval(tickClocks, 1000);
+</script>
+</body>
+</html>
