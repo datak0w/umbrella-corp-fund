@@ -373,12 +373,21 @@ function chart(hist,sharePct){
 
 function render(d){
   const u=d.user||{}, a=d.account||{}, dep=d.deposit||{};
+  const hist=d.history||[];
+  const entryDate=String(a.entry_date||"");
+  let opDays=hist.length;
+  if(entryDate){
+    const start=Date.parse(entryDate+"T00:00:00Z");
+    if(!isNaN(start)) opDays=Math.max(1,Math.floor((Date.now()-start)/86400000)+1);
+  }
+  opDays=Math.max(1,opDays||1);
+  const roiDaily=(+a.roi||0)/opDays;
   $("who").textContent=u.username||"";
   $("kpis").innerHTML =
     `<div class="kpi kpi-valor"><div class="lab">Valor actual</div><div class="val">${money(a.valor)}</div><div class="kpi-chart" id="chart"></div></div>`+
     `<div class="kpi"><div class="lab">Aportado</div><div class="val">${money(a.aportado)}</div><div class="sub">${d.wallet?"wallet "+addr(d.wallet):"sin wallet vinculada"}</div></div>`+
-    `<div class="kpi"><div class="lab">Ganado</div><div class="val ${cls(a.ganado)}">${(a.ganado>0?"+":"")+money(a.ganado)}</div><div class="sub"><b class="${cls(a.roi)}">${pct(a.roi)}</b></div></div>`;
-  const hist=d.history||[], share=+a.parte||0, open=a.open_positions||d.open_positions||[];
+    `<div class="kpi"><div class="lab">Ganado</div><div class="val ${cls(a.ganado)}">${(a.ganado>0?"+":"")+money(a.ganado)}</div><div class="sub"><b class="${cls(a.roi)}">${pct(a.roi)}</b> · ${opDays} ${opDays===1?"día":"días"} · ${pct(roiDaily,3)}/día</div></div>`;
+  const share=+a.parte||0, open=a.open_positions||d.open_positions||[];
   LAST=d;
   const signed=v=>(v==null||isNaN(v))?"—":((v>0?"+":"")+money(v));
   $("openTag").textContent=open.length?("· "+open.length):"";
