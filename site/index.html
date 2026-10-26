@@ -275,14 +275,10 @@ function chart(hist,sharePct){
 function render(d){
   const u=d.user||{}, a=d.account||{}, dep=d.deposit||{};
   $("who").textContent=u.username||"";
-  const nav = a.nav!=null ? a.nav : (a.units ? (a.valor / a.units) : null);
   $("kpis").innerHTML =
     `<div class="kpi"><div class="lab">Aportado</div><div class="val">${money(a.aportado)}</div><div class="sub">${d.wallet?"wallet "+addr(d.wallet):"sin wallet vinculada"}</div></div>`+
     `<div class="kpi"><div class="lab">Valor actual</div><div class="val">${money(a.valor)}</div><div class="sub">neto de comisión · ${a.units!=null?fmt(a.units,4)+" unidades":"—"}</div></div>`+
-    `<div class="kpi"><div class="lab">Ganado</div><div class="val ${cls(a.ganado)}">${(a.ganado>0?"+":"")+money(a.ganado)}</div><div class="sub"><b class="${cls(a.roi)}">${pct(a.roi)}</b></div></div>`+
-    `<div class="kpi"><div class="lab">Parte del fondo</div><div class="val">${fmt(a.parte,2)}%</div><div class="sub">${money(a.valor)} de ${money(a.equity!=null?a.equity:a.valor)}</div></div>`+
-    `<div class="kpi"><div class="lab">Unidades</div><div class="val">${a.units!=null?fmt(a.units,4):"—"}</div><div class="sub">NAV ${nav!=null?fmt(nav,6):"—"} $/unidad</div></div>`+
-    `<div class="kpi"><div class="lab">Comisión de éxito</div><div class="val">${fmt(((a.fee_rate!=null?a.fee_rate:0.25)*100),0)}%</div><div class="sub">HWM NAV ${a.hwm_nav!=null?fmt(a.hwm_nav,4):"—"} · devengada ${money(a.fee_accrued||0)}</div></div>`;
+    `<div class="kpi"><div class="lab">Ganado</div><div class="val ${cls(a.ganado)}">${(a.ganado>0?"+":"")+money(a.ganado)}</div><div class="sub"><b class="${cls(a.roi)}">${pct(a.roi)}</b></div></div>`;
   const hist=d.history||[], share=+a.parte||0;
   const ops=d.operations||[], open=d.open_positions||[];
   const sharePct=a.share_pct!=null?+a.share_pct:share;
