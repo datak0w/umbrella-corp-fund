@@ -46,6 +46,20 @@ main{max-width:1100px;margin:0 auto;padding:20px}
 .kpi .lab{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--dim)}
 .kpi .val{font-size:24px;font-weight:700;margin-top:4px}
 .kpi .sub{font-size:11.5px;color:var(--dim);margin-top:2px}
+.kpi-valor .kpi-chart{margin-top:8px}
+.kpi-chart svg{display:block;width:100%;height:68px}
+.kpi-chart .pad{padding:8px 0 0;font-size:11px}
+.assetRow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.assetBadge{display:inline-flex;align-items:center;gap:7px;padding:5px 9px;border:1px solid var(--line);
+  border-radius:999px;background:var(--surface);font-size:11px;font-weight:600;color:var(--txt)}
+.assetBadge svg{width:16px;height:16px;display:block;flex:none}
+.assetBadge.poly{border-color:rgba(130,71,229,.55)}
+.assetBadge.usdc{border-color:rgba(39,117,202,.55)}
+.assetBadge small{font-weight:500;color:var(--dim);margin-left:2px}
+.subtabs{display:flex;gap:6px;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
+.subtabs button{flex:1;border:1px solid transparent;background:transparent;color:var(--dim);padding:8px 10px;
+  border-radius:8px;cursor:pointer;font:inherit;font-size:12px;font-weight:600}
+.subtabs button.on{background:var(--panel);border-color:var(--line);color:var(--txt)}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-bottom:16px;overflow:hidden}
 .panel h2{font-size:13px;margin:0;padding:12px 16px;border-bottom:1px solid var(--line);color:var(--dim);
   text-transform:uppercase;letter-spacing:.6px;display:flex;align-items:center;gap:8px}
@@ -53,6 +67,16 @@ main{max-width:1100px;margin:0 auto;padding:20px}
 .tag{color:var(--dim);font-weight:500;text-transform:none;letter-spacing:0}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:820px){.grid2{grid-template-columns:1fr}}
+@media(max-width:640px){
+  main{padding:14px}
+  header{padding:12px 14px}
+  .kpis{grid-template-columns:1fr 1fr;gap:10px}
+  .kpi-valor{grid-column:1/-1}
+  .kpi .val{font-size:22px}
+  .assetRow{gap:6px}
+  .actions .btn{flex:1 1 auto;text-align:center}
+  .subtabs{padding:8px 12px}
+}
 .addr{font-family:"IBM Plex Mono",monospace;font-size:13px;word-break:break-all;background:var(--surface);
   border:1px dashed var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
 .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
@@ -130,16 +154,23 @@ footer{max-width:1100px;margin:0 auto;padding:10px 20px 30px;color:var(--dim);fo
   <main>
     <div class="kpis" id="kpis"></div>
 
-    <section class="panel"><h2>Operaciones del fondo <span class="tag" id="opsTag"></span></h2>
-      <div class="scroll"><table id="opsT"><thead></thead><tbody></tbody></table></div></section>
-
     <section class="panel"><h2>Posiciones abiertas <span class="tag" id="openTag"></span></h2>
       <div class="scroll"><table id="openT"><thead></thead><tbody></tbody></table></div></section>
 
-    <section class="panel"><h2>Mi evolución <span class="tag" id="eqTag"></span></h2><div class="chart" id="chart"></div></section>
+    <section class="panel"><h2>Operaciones <span class="tag" id="opsTag"></span></h2>
+      <div class="subtabs" role="tablist">
+        <button id="tabFund" type="button" class="on" role="tab" aria-selected="true">Fondo</button>
+        <button id="tabMine" type="button" role="tab" aria-selected="false">Mi operativa</button>
+      </div>
+      <div class="muted small" id="opsEntryNote" style="padding:10px 16px 0"></div>
+      <div class="scroll"><table id="opsT"><thead></thead><tbody></tbody></table></div></section>
 
     <div class="grid2">
       <section class="panel"><h2>Depositar</h2><div class="pad">
+        <div class="assetRow">
+          <span class="assetBadge poly"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m17.82 16.342 5.692-3.287A.98.98 0 0 0 24 12.21V5.635a.98.98 0 0 0-.488-.846l-5.693-3.286a.98.98 0 0 0-.977 0L11.15 4.789a.98.98 0 0 0-.489.846v11.747L6.67 19.686l-3.992-2.304v-4.61l3.992-2.304 2.633 1.52V8.896L7.158 7.658a.98.98 0 0 0-.977 0L.488 10.945a.98.98 0 0 0-.488.846v6.573a.98.98 0 0 0 .488.847l5.693 3.286a.981.981 0 0 0 .977 0l5.692-3.286a.98.98 0 0 0 .489-.846V6.618l.072-.041 3.92-2.263 3.99 2.305v4.609l-3.99 2.304-2.63-1.517v3.092l2.14 1.236a.981.981 0 0 0 .978 0v-.001Z"/></svg>Polygon PoS</span>
+          <span class="assetBadge usdc"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#2775CA"/><circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="1.2"/><text x="12" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">$</text></svg>USDC.e <small>bridged</small></span>
+        </div>
         <div class="addr" id="depAddr">—</div>
         <div class="actions">
           <button class="btn ghost" id="btnCopy" type="button">Copiar address</button>
@@ -148,6 +179,7 @@ footer{max-width:1100px;margin:0 auto;padding:10px 20px 30px;color:var(--dim);fo
             QR
           </button>
           <a class="btn ghost" id="depScan" href="#" target="_blank" rel="noopener" style="text-decoration:none">Ver en Polygonscan</a>
+          <a class="btn ghost" href="https://jumper.xyz/" target="_blank" rel="noopener" style="text-decoration:none">Bridge en Jumper</a>
         </div>
         <div class="muted small" style="margin-top:10px">Envía <b>USDC.e (bridged) en Polygon</b> a esta dirección. Se acredita automáticamente al confirmarse (≈1 min). No envíes USDC nativo: no se detecta.<button class="info" id="btnUsdcInfo" type="button" title="Cómo comprar y bridgear USDC.e" aria-label="Cómo comprar y bridgear USDC.e">i</button></div>
       </div></section>
@@ -174,6 +206,10 @@ footer{max-width:1100px;margin:0 auto;padding:10px 20px 30px;color:var(--dim);fo
     <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="qrTitle">
       <button class="modalX" type="button" data-close="qrModal" aria-label="Cerrar">×</button>
       <h3 id="qrTitle">Depositar USDC.e en Polygon</h3>
+      <div class="assetRow">
+        <span class="assetBadge poly"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m17.82 16.342 5.692-3.287A.98.98 0 0 0 24 12.21V5.635a.98.98 0 0 0-.488-.846l-5.693-3.286a.98.98 0 0 0-.977 0L11.15 4.789a.98.98 0 0 0-.489.846v11.747L6.67 19.686l-3.992-2.304v-4.61l3.992-2.304 2.633 1.52V8.896L7.158 7.658a.98.98 0 0 0-.977 0L.488 10.945a.98.98 0 0 0-.488.846v6.573a.98.98 0 0 0 .488.847l5.693 3.286a.981.981 0 0 0 .977 0l5.692-3.286a.98.98 0 0 0 .489-.846V6.618l.072-.041 3.92-2.263 3.99 2.305v4.609l-3.99 2.304-2.63-1.517v3.092l2.14 1.236a.981.981 0 0 0 .978 0v-.001Z"/></svg>Polygon PoS</span>
+        <span class="assetBadge usdc"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#2775CA"/><circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="1.2"/><text x="12" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">$</text></svg>USDC.e <small>bridged</small></span>
+      </div>
       <img id="qrImg" class="qrImg" alt="QR de la dirección de depósito" referrerpolicy="no-referrer">
       <div class="addr" id="qrAddr">—</div>
       <div class="actions"><button class="btn ghost" id="qrCopy" type="button">Copiar address</button></div>
@@ -185,17 +221,23 @@ footer{max-width:1100px;margin:0 auto;padding:10px 20px 30px;color:var(--dim);fo
     <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="usdcTitle">
       <button class="modalX" type="button" data-close="usdcModal" aria-label="Cerrar">×</button>
       <h3 id="usdcTitle">Cómo obtener USDC.e (Polygon)</h3>
-      <p>USDC.e es la versión <b>bridged</b> de USDC que usa Polymarket en Polygon. No es el USDC nativo de Circle.</p>
+      <div class="assetRow">
+        <span class="assetBadge poly"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m17.82 16.342 5.692-3.287A.98.98 0 0 0 24 12.21V5.635a.98.98 0 0 0-.488-.846l-5.693-3.286a.98.98 0 0 0-.977 0L11.15 4.789a.98.98 0 0 0-.489.846v11.747L6.67 19.686l-3.992-2.304v-4.61l3.992-2.304 2.633 1.52V8.896L7.158 7.658a.98.98 0 0 0-.977 0L.488 10.945a.98.98 0 0 0-.488.846v6.573a.98.98 0 0 0 .488.847l5.693 3.286a.981.981 0 0 0 .977 0l5.692-3.286a.98.98 0 0 0 .489-.846V6.618l.072-.041 3.92-2.263 3.99 2.305v4.609l-3.99 2.304-2.63-1.517v3.092l2.14 1.236a.981.981 0 0 0 .978 0v-.001Z"/></svg>Polygon PoS</span>
+        <span class="assetBadge usdc"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#2775CA"/><circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="1.2"/><text x="12" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">$</text></svg>USDC.e <small>bridged</small></span>
+        <span class="assetBadge" style="border-color:rgba(244,63,94,.5);opacity:.85"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#2775CA"/><circle cx="12" cy="12" r="9" fill="none" stroke="#fff" stroke-width="1.2"/><text x="12" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">$</text></svg>USDC nativo <small>no usar</small></span>
+      </div>
+      <p>Red: <b>Polygon PoS</b>. Token: <b>USDC.e</b> (USDC bridged, no el USDC nativo de Circle).</p>
       <ol>
         <li>Compra USDC en tu exchange o wallet habitual.</li>
         <li>Retíralo o envíalo a tu wallet en la red <b>Polygon PoS</b>. Si el exchange solo envía USDC nativo, tendrás que convertirlo a USDC.e.</li>
-        <li>Si tienes USDC en Ethereum u otra red, usa el <a href="https://portal.polygon.technology/bridge" target="_blank" rel="noopener">Polygon Bridge</a> para pasarlo a Polygon.</li>
+        <li>Si tienes USDC en Ethereum u otra red, usa <a href="https://jumper.xyz/" target="_blank" rel="noopener">Jumper</a> o el <a href="https://portal.polygon.technology/bridge" target="_blank" rel="noopener">Polygon Bridge</a> para pasarlo a Polygon.</li>
         <li>Si ya tienes USDC nativo en Polygon, haz swap a USDC.e en <a href="https://app.uniswap.org/swap?chain=polygon" target="_blank" rel="noopener">Uniswap</a> o en tu DEX habitual.</li>
         <li>Envía el USDC.e a la dirección de depósito que te mostramos. No envíes USDC nativo: el contrato de depósito no lo detecta.</li>
       </ol>
       <p><b>USDC.e (bridged):</b><br><code>0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174</code></p>
       <p><b>USDC nativo (no usar):</b><br><code>0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359</code></p>
       <div class="actions">
+        <a class="btn ghost" href="https://jumper.xyz/" target="_blank" rel="noopener">Bridge en Jumper</a>
         <a class="btn ghost" href="https://portal.polygon.technology/bridge" target="_blank" rel="noopener">Polygon Bridge</a>
         <a class="btn ghost" href="https://app.uniswap.org/swap?chain=polygon" target="_blank" rel="noopener">Uniswap Polygon</a>
         <a class="btn ghost" href="https://polygonscan.com/token/0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174" target="_blank" rel="noopener">USDC.e en Polygonscan</a>
@@ -215,7 +257,7 @@ const money=(v,d=2)=>(v===null||v===undefined||isNaN(v))?"—":fmt(v,d)+" $";
 const pct=(v,d=2)=>(v===null||v===undefined||isNaN(v))?"—":((v>0?"+":"")+fmt(v,d)+"%");
 const cls=v=>(v===null||v===undefined||v===0)?"flat":(v>0?"pos":"neg");
 const addr=a=>a?(a.slice(0,6)+"…"+a.slice(-4)):"—";
-let API="", ST=null, TIMER=null, ME=null;
+let API="", ST=null, TIMER=null, ME=null, LAST=null, OPS_TAB="fund";
 
 function applyTheme(t){document.documentElement.dataset.theme=t;$("btnTheme").textContent=t==="dark"?"☾":"☀";}
 try{applyTheme(localStorage.getItem("fund_theme")||"dark");}catch(e){applyTheme("dark");}
@@ -333,30 +375,22 @@ function render(d){
   const u=d.user||{}, a=d.account||{}, dep=d.deposit||{};
   $("who").textContent=u.username||"";
   $("kpis").innerHTML =
+    `<div class="kpi kpi-valor"><div class="lab">Valor actual</div><div class="val">${money(a.valor)}</div><div class="kpi-chart" id="chart"></div></div>`+
     `<div class="kpi"><div class="lab">Aportado</div><div class="val">${money(a.aportado)}</div><div class="sub">${d.wallet?"wallet "+addr(d.wallet):"sin wallet vinculada"}</div></div>`+
-    `<div class="kpi"><div class="lab">Valor actual</div><div class="val">${money(a.valor)}</div></div>`+
     `<div class="kpi"><div class="lab">Ganado</div><div class="val ${cls(a.ganado)}">${(a.ganado>0?"+":"")+money(a.ganado)}</div><div class="sub"><b class="${cls(a.roi)}">${pct(a.roi)}</b></div></div>`;
-  const hist=d.history||[], share=+a.parte||0;
-  const ops=(d.operations||[]).slice(0,10), open=d.open_positions||[];
+  const hist=d.history||[], share=+a.parte||0, open=d.open_positions||[];
+  LAST=d;
   const signed=v=>(v==null||isNaN(v))?"—":((v>0?"+":"")+money(v));
-  $("opsTag").textContent=ops.length?("· últimas "+ops.length):"";
-  document.querySelector("#opsT thead").innerHTML=`<tr><th>Día</th><th>Ciudad</th><th>Entrada</th><th>Resultado</th><th class="r">Coste</th><th class="r">PnL</th><th class="r">ROI</th></tr>`;
-  document.querySelector("#opsT tbody").innerHTML=ops.length?ops.map(x=>{
-    const res=x.open?'<span class="pill">abierta</span>':x.pnl>0?'<span class="pill win">ganada</span>':x.pnl<0?'<span class="pill loss">perdida</span>':'<span class="pill">plana</span>';
-    return `<tr><td class="muted">${esc(String(x.day||"").slice(0,10))}</td><td>${esc(x.city_name||x.city||"—")}</td>
-      <td>${esc(x.entry||"—")}</td><td>${res}</td><td class="r">${money(x.cost)}</td>
-      <td class="r ${cls(x.pnl)}">${signed(x.pnl)}</td><td class="r ${cls(x.roi)}">${pct(x.roi,1)}</td></tr>`;
-  }).join(""):`<tr><td colspan="7" class="muted" style="padding:14px">sin operaciones cerradas del fondo</td></tr>`;
   $("openTag").textContent=open.length?("· "+open.length):"";
-  document.querySelector("#openT thead").innerHTML=`<tr><th>Día</th><th>Ciudad</th><th>Entrada</th><th class="r">Shares</th><th class="r">Coste</th><th class="r">Valor marcado</th><th class="r">PnL abierto</th><th class="r">Si gana</th></tr>`;
+  document.querySelector("#openT thead").innerHTML=`<tr><th>Día</th><th>Ciudad</th><th>Entrada</th><th class="r">Shares</th><th class="r">Coste</th><th class="r">Valor</th><th class="r">PnL abierto</th><th class="r">Si gana</th></tr>`;
   document.querySelector("#openT tbody").innerHTML=open.length?open.map(x=>`
     <tr><td class="muted">${esc(String(x.day||"").slice(0,10))}</td><td>${esc(x.city_name||x.city||"—")}</td>
       <td>${esc(x.entry||"—")}</td><td class="r">${fmt(x.shares,4)}</td><td class="r">${money(x.cost)}</td>
       <td class="r">${money(x.value)}</td><td class="r ${cls(x.pnl)}">${signed(x.pnl)}</td>
       <td class="r ${cls(x.expected)}">${signed(x.expected)}</td></tr>`).join("")
     :`<tr><td colspan="8" class="muted" style="padding:14px">sin posiciones abiertas del fondo</td></tr>`;
-  $("eqTag").textContent=hist.length?("· "+hist.length+" días"):"";
   $("chart").innerHTML=chart(hist,share);
+  renderOps();
   $("depAddr").textContent=dep.address||"—";
   $("depAddr").title=dep.address||"";
   $("depScan").href = dep.address ? ("https://polygonscan.com/address/"+dep.address) : "#";
@@ -399,6 +433,29 @@ function render(d){
   $("wMsg").textContent="Las retiradas se autorizan manualmente (≤24 h).";
 }
 
+function renderOps(){
+  const d=LAST||{}, a=d.account||{}, all=d.operations||[];
+  const entry=String(a.entry_date||"");
+  const mine=entry?all.filter(x=>String(x.day||"")>=entry):[];
+  const list=(OPS_TAB==="mine"?mine:all).slice(0,15);
+  const signed=v=>(v==null||isNaN(v))?"—":((v>0?"+":"")+money(v));
+  $("tabFund").classList.toggle("on",OPS_TAB==="fund");
+  $("tabMine").classList.toggle("on",OPS_TAB==="mine");
+  $("tabFund").setAttribute("aria-selected",OPS_TAB==="fund"?"true":"false");
+  $("tabMine").setAttribute("aria-selected",OPS_TAB==="mine"?"true":"false");
+  $("opsTag").textContent="· "+list.length;
+  $("opsEntryNote").innerHTML=OPS_TAB==="mine"
+    ? (entry?`Participas en las operaciones desde <b>${esc(entry)}</b>.`:"Aún no tienes una fecha de ingreso registrada.")
+    : "Últimas 15 operaciones del fondo.";
+  document.querySelector("#opsT thead").innerHTML=`<tr><th>Día</th><th>Ciudad</th><th>Entrada</th><th>Resultado</th><th class="r">Coste</th><th class="r">PnL</th><th class="r">ROI</th></tr>`;
+  document.querySelector("#opsT tbody").innerHTML=list.length?list.map(x=>{
+    const res=x.open?'<span class="pill">abierta</span>':x.pnl>0?'<span class="pill win">ganada</span>':x.pnl<0?'<span class="pill loss">perdida</span>':'<span class="pill">plana</span>';
+    return `<tr><td class="muted">${esc(String(x.day||"").slice(0,10))}</td><td>${esc(x.city_name||x.city||"—")}</td>
+      <td>${esc(x.entry||"—")}</td><td>${res}</td><td class="r">${money(x.cost)}</td>
+      <td class="r ${cls(x.pnl)}">${signed(x.pnl)}</td><td class="r ${cls(x.roi)}">${pct(x.roi,1)}</td></tr>`;
+  }).join(""):`<tr><td colspan="7" class="muted" style="padding:14px">${OPS_TAB==="mine"?"aún no hay operaciones desde tu ingreso":"sin operaciones del fondo"}</td></tr>`;
+}
+
 async function bindWallet(){
   if(!window.ethereum){ alert("No hay wallet en el navegador."); return; }
   try{
@@ -427,6 +484,8 @@ document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{ i
 document.addEventListener("keydown",e=>{ if(e.key==="Escape") document.querySelectorAll(".modal:not([hidden])").forEach(m=>closeModal(m.id)); });
 $("btnQr").addEventListener("click",()=>openModal("qrModal"));
 $("btnUsdcInfo").addEventListener("click",()=>openModal("usdcModal"));
+$("tabFund").addEventListener("click",()=>{OPS_TAB="fund";renderOps();});
+$("tabMine").addEventListener("click",()=>{OPS_TAB="mine";renderOps();});
 
 $("btnWithdraw").addEventListener("click",async()=>{
   const amount=+$("wAmount").value||0, to=$("wTo").value.trim();
