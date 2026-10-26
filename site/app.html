@@ -111,6 +111,14 @@ footer{max-width:1100px;margin:0 auto;padding:10px 20px 30px;color:var(--dim);fo
   <main>
     <div class="kpis" id="kpis"></div>
 
+    <section class="panel"><h2>Operaciones del fondo <span class="tag" id="opsTag"></span></h2>
+      <div class="pad muted small" id="opsNote"></div>
+      <div class="scroll"><table id="opsT"><thead></thead><tbody></tbody></table></div></section>
+
+    <section class="panel"><h2>Posiciones abiertas <span class="tag" id="openTag"></span></h2>
+      <div class="pad muted small" id="openNote"></div>
+      <div class="scroll"><table id="openT"><thead></thead><tbody></tbody></table></div></section>
+
     <section class="panel"><h2>Mi evolución <span class="tag" id="eqTag"></span></h2><div class="chart" id="chart"></div></section>
 
     <div class="grid2">
@@ -276,6 +284,29 @@ function render(d){
     `<div class="kpi"><div class="lab">Unidades</div><div class="val">${a.units!=null?fmt(a.units,4):"—"}</div><div class="sub">NAV ${nav!=null?fmt(nav,6):"—"} $/unidad</div></div>`+
     `<div class="kpi"><div class="lab">Comisión de éxito</div><div class="val">${fmt(((a.fee_rate!=null?a.fee_rate:0.25)*100),0)}%</div><div class="sub">HWM NAV ${a.hwm_nav!=null?fmt(a.hwm_nav,4):"—"} · devengada ${money(a.fee_accrued||0)}</div></div>`;
   const hist=d.history||[], share=+a.parte||0;
+  const ops=d.operations||[], open=d.open_positions||[];
+  const sharePct=a.share_pct!=null?+a.share_pct:share;
+  const signed=v=>(v==null||isNaN(v))?"—":((v>0?"+":"")+money(v));
+  $("opsTag").textContent=ops.length?("· "+ops.length):"";
+  $("opsNote").innerHTML=`Importes según tu participación actual <b>${fmt(sharePct,2)}%</b>`+
+    (a.fund&&a.fund.pnl!=null?` · Fondo: ${money(a.fund.equity)} · aportado ${money(a.fund.aportado)} · PnL ${signed(a.fund.pnl)}`:"")+
+    ` · Las operaciones anteriores a tu entrada son históricas.`;
+  document.querySelector("#opsT thead").innerHTML=`<tr><th>Día</th><th>Ciudad</th><th>Entrada</th><th>Resultado</th><th class="r">Coste</th><th class="r">PnL</th><th class="r">ROI</th></tr>`;
+  document.querySelector("#opsT tbody").innerHTML=ops.length?ops.map(x=>{
+    const res=x.open?'<span class="pill">abierta</span>':x.pnl>0?'<span class="pill win">ganada</span>':x.pnl<0?'<span class="pill loss">perdida</span>':'<span class="pill">plana</span>';
+    return `<tr><td class="muted">${esc(String(x.day||"").slice(0,10))}</td><td>${esc(x.city_name||x.city||"—")}</td>
+      <td>${esc(x.entry||"—")}</td><td>${res}</td><td class="r">${money(x.cost)}</td>
+      <td class="r ${cls(x.pnl)}">${signed(x.pnl)}</td><td class="r ${cls(x.roi)}">${pct(x.roi,1)}</td></tr>`;
+  }).join(""):`<tr><td colspan="7" class="muted" style="padding:14px">sin operaciones cerradas del fondo</td></tr>`;
+  $("openTag").textContent=open.length?("· "+open.length):"";
+  $("openNote").innerHTML=`Valores marcados a mercado · tu parte actual <b>${fmt(sharePct,2)}%</b>. Si la posición gana, el pago se calcula por las shares cubiertas.`;
+  document.querySelector("#openT thead").innerHTML=`<tr><th>Día</th><th>Ciudad</th><th>Entrada</th><th class="r">Shares</th><th class="r">Coste</th><th class="r">Valor marcado</th><th class="r">PnL abierto</th><th class="r">Si gana</th></tr>`;
+  document.querySelector("#openT tbody").innerHTML=open.length?open.map(x=>`
+    <tr><td class="muted">${esc(String(x.day||"").slice(0,10))}</td><td>${esc(x.city_name||x.city||"—")}</td>
+      <td>${esc(x.entry||"—")}</td><td class="r">${fmt(x.shares,4)}</td><td class="r">${money(x.cost)}</td>
+      <td class="r">${money(x.value)}</td><td class="r ${cls(x.pnl)}">${signed(x.pnl)}</td>
+      <td class="r ${cls(x.expected)}">${signed(x.expected)}</td></tr>`).join("")
+    :`<tr><td colspan="8" class="muted" style="padding:14px">sin posiciones abiertas del fondo</td></tr>`;
   $("eqTag").textContent=hist.length?("· "+hist.length+" días"):"";
   $("chart").innerHTML=chart(hist,share);
   $("depAddr").textContent=dep.address||"—";
@@ -285,14 +316,14 @@ function render(d){
   $("wAvail").innerHTML = (a.disponible!=null)
     ? `Disponible ahora: <b>${money(a.disponible)}</b> <span class="muted">(caja libre del fondo: ${money(a.free_cash)}; tu valor total: ${money(a.valor)})</span>`
     : "";
-  const deps=d.deposits||[];
+  const deps=d.contributions||d.deposits||[];
   $("depTag").textContent=deps.length?("· "+deps.length):"";
-  document.querySelector("#depT thead").innerHTML=`<tr><th>Fecha</th><th class="r">Importe</th><th>Estado</th><th>Tx</th></tr>`;
+  document.querySelector("#depT thead").innerHTML=`<tr><th>Fecha</th><th class="r">Importe</th><th>Estado</th><th>Aporte / Tx</th></tr>`;
   document.querySelector("#depT tbody").innerHTML=deps.length?deps.map(x=>`
-    <tr><td class="muted">${esc(String(x.created_at||"").slice(0,10))}</td>
+    <tr><td class="muted">${esc(String(x.created_at||x.ts||"").slice(0,10))}</td>
       <td class="r">${money(x.amount)}</td>
       <td>${x.status==="credited"?'<span class="pill win">acreditado</span>':'<span class="pill">pendiente</span>'}</td>
-      <td>${x.tx_hash?`<a href="https://polygonscan.com/tx/${esc(x.tx_hash)}" target="_blank" rel="noopener">${esc(String(x.tx_hash).slice(0,10))}…</a>`:"—"}</td></tr>`).join("")
+      <td>${x.tx_hash?`<a href="https://polygonscan.com/tx/${esc(x.tx_hash)}" target="_blank" rel="noopener">${esc(String(x.tx_hash).slice(0,10))}…</a>`:(x.ref?`<span class="muted">${esc(String(x.ref).slice(0,28))}${String(x.ref).length>28?"…":""}</span>`:"—")}</td></tr>`).join("")
     :`<tr><td colspan="4" class="muted" style="padding:14px">sin depósitos</td></tr>`;
   const wds=d.withdrawals||[];
   $("wdTag").textContent=wds.length?("· "+wds.length):"";
