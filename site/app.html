@@ -384,7 +384,7 @@ function render(d){
   const roiDaily=(+a.roi||0)/opDays;
   $("who").textContent=u.username||"";
   $("kpis").innerHTML =
-    `<div class="kpi kpi-valor"><div class="lab">Valor actual</div><div class="val">${money(a.valor)}</div><div class="kpi-chart" id="chart"></div></div>`+
+    `<div class="kpi kpi-valor"><div class="lab">Valor actual</div><div class="val">${money(a.valor)}</div><div class="sub">Capital disponible <b>${money(a.disponible)}</b></div><div class="kpi-chart" id="chart"></div></div>`+
     `<div class="kpi"><div class="lab">Aportado</div><div class="val">${money(a.aportado)}</div><div class="sub">${d.wallet?"wallet "+addr(d.wallet):"sin wallet vinculada"}</div></div>`+
     `<div class="kpi"><div class="lab">Ganado</div><div class="val ${cls(a.ganado)}">${(a.ganado>0?"+":"")+money(a.ganado)}</div><div class="sub"><b class="${cls(a.roi)}">${pct(a.roi)}</b> · ${opDays} ${opDays===1?"día":"días"} · ${pct(roiDaily,3)}/día</div></div>`;
   const share=+a.parte||0, open=a.open_positions||d.open_positions||[];
