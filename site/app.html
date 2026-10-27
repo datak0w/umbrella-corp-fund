@@ -195,6 +195,19 @@ footer{max-width:1100px;margin:0 auto;padding:10px 20px 30px;color:var(--dim);fo
     <section class="panel"><h2>Mis retiradas <span class="tag" id="wdTag"></span></h2>
       <div class="scroll"><table id="wdT"><thead></thead><tbody></tbody></table></div></section>
 
+    <section id="commercialPanel" hidden>
+      <div class="kpis" id="refKpis"></div>
+      <section class="panel">
+        <h2>Mis referidos <span class="tag" id="refsTag"></span></h2>
+        <div class="scroll"><table id="refsT"><thead></thead><tbody></tbody></table></div>
+      </section>
+      <section class="panel">
+        <h2>Mis comisiones <span class="tag" id="commTag"></span></h2>
+        <div class="pad small" id="commSummary"></div>
+        <div class="scroll"><table id="commPaysT"><thead></thead><tbody></tbody></table></div>
+      </section>
+    </section>
+
     <section class="panel"><h2>Wallet de acceso</h2><div class="pad" id="walletBox"></div></section>
   </main>
   <footer>Umbrella Corp. FUND · datos del fondo en tiempo real. No es asesoramiento financiero.</footer>
@@ -441,6 +454,42 @@ function render(d){
     $("btnBind").addEventListener("click",bindWallet);
   }
   $("wMsg").textContent="Las retiradas se autorizan manualmente (≤24 h).";
+  renderCommercial(d);
+}
+
+function renderCommercial(d){
+  const c=d&&d.commercial, panel=$("commercialPanel");
+  if(!c){ panel.hidden=true; return; }
+  panel.hidden=false;
+  if(c.error){
+    $("refKpis").innerHTML=`<div class="kpi"><div class="lab">Mis referidos</div><div class="val">—</div><div class="sub">${esc(c.error)}</div></div>`;
+    document.querySelector("#refsT tbody").innerHTML=""; document.querySelector("#commPaysT tbody").innerHTML="";
+    return;
+  }
+  const t=c.totals||{}, refs=c.referrals||[], pays=c.payouts||[];
+  $("refKpis").innerHTML =
+    `<div class="kpi"><div class="lab">Comisión cobrada</div><div class="val">${feeMoney(t.collected)}</div><div class="sub">abonada a tu cuenta del fondo</div></div>`+
+    `<div class="kpi"><div class="lab">Pendiente de cobro</div><div class="val">${feeMoney(t.pending)}</div><div class="sub">cuando el cliente cobra y se abona</div></div>`+
+    `<div class="kpi"><div class="lab">Mis referidos</div><div class="val">${t.referrals||0}</div><div class="sub">${money(t.deposits)} aportados · ${money(t.withdrawals)} retirados</div></div>`+
+    `<div class="kpi"><div class="lab">Comisión total</div><div class="val">${feeMoney(t.total)}</div><div class="sub">5% de la ganancia de tus clientes</div></div>`;
+  $("refsTag").textContent=refs.length?("· "+refs.length):"";
+  document.querySelector("#refsT thead").innerHTML=`<tr><th>Cliente</th><th class="r">Depósitos</th><th class="r">Retiros</th><th class="r">Comisión pendiente</th><th class="r">Comisión cobrada</th><th class="r">Total comisión</th></tr>`;
+  document.querySelector("#refsT tbody").innerHTML=refs.length?refs.map(r=>`
+    <tr><td><b>${esc(r.username)}</b> ${r.status==="active"?'<span class="pill win">activo</span>':'<span class="pill loss">bloqueado</span>'}</td>
+      <td class="r">${money(r.deposits)}</td><td class="r">${money(r.withdrawals)}</td>
+      <td class="r">${feeMoney(r.commission_pending)}</td><td class="r">${feeMoney(r.commission_collected)}</td>
+      <td class="r">${feeMoney(r.commission_total)}</td></tr>`).join("")
+    :`<tr><td colspan="6" class="muted" style="padding:14px">aún no tienes referidos</td></tr>`;
+  $("commTag").textContent=pays.length?("· "+pays.length):"";
+  $("commSummary").innerHTML=`Has cobrado <b>${feeMoney(t.collected)}</b> · te queda por cobrar <b>${feeMoney(t.pending)}</b>. Los abonos se convierten en participaciones del fondo al NAV del día.`;
+  document.querySelector("#commPaysT thead").innerHTML=`<tr><th>Fecha</th><th class="r">Importe</th><th>Estado</th><th>Destino</th></tr>`;
+  document.querySelector("#commPaysT tbody").innerHTML=pays.length?pays.map(x=>{
+    const st=x.status==="credited"?'<span class="pill win">abonada a cuenta</span>':x.status==="paid"?'<span class="pill win">pagada</span>':'<span class="pill">'+esc(x.status||"")+'</span>';
+    const dest=String(x.to_address||"").startsWith("account:")?"Cuenta del fondo":(x.to_address?addr(x.to_address):"—");
+    const tx=x.tx_hash?` <a href="https://polygonscan.com/tx/${esc(x.tx_hash)}" target="_blank" rel="noopener">tx</a>`:"";
+    return `<tr><td class="muted">${esc(String(x.ts||"").slice(0,10))}</td><td class="r">${money(x.amount)}</td>
+      <td>${st}</td><td class="muted">${dest}${tx}</td></tr>`;
+  }).join(""):`<tr><td colspan="4" class="muted" style="padding:14px">aún no hay comisiones cobradas</td></tr>`;
 }
 
 function renderOps(){
