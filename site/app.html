@@ -254,6 +254,7 @@ const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const fmt=(v,d=2)=>(v===null||v===undefined||isNaN(v))?"—":Number(v).toLocaleString("es-ES",{minimumFractionDigits:d,maximumFractionDigits:d});
 const money=(v,d=2)=>(v===null||v===undefined||isNaN(v))?"—":fmt(v,d)+" $";
+const feeMoney=v=>(v===null||v===undefined||isNaN(v))?"—":fmt(v,6)+" $";
 const pct=(v,d=2)=>(v===null||v===undefined||isNaN(v))?"—":((v>0?"+":"")+fmt(v,d)+"%");
 const cls=v=>(v===null||v===undefined||v===0)?"flat":(v>0?"pos":"neg");
 const addr=a=>a?(a.slice(0,6)+"…"+a.slice(-4)):"—";
@@ -382,11 +383,19 @@ function render(d){
   }
   opDays=Math.max(1,opDays||1);
   const roiDaily=(+a.roi||0)/opDays;
+  const feePct=(a.fee_rate!=null?+a.fee_rate:0.25)*100;
+  const grossValue=(a.gross_value!=null?+a.gross_value:+a.valor||0);
+  const feeShare=+(a.fee_share||0);
+  const grossGain=(a.gross_gain!=null?+a.gross_gain:+a.ganado||0);
+  const netGain=(a.net_gain!=null?+a.net_gain:+a.ganado||0);
+  const maxWithdraw=(a.max_withdraw!=null?+a.max_withdraw:+a.disponible||0);
+  const valueTip=`Bruto ${money(grossValue,4)} · comisión ${fmt(feePct,0)}%: −${feeMoney(feeShare)} · neto ${money(a.valor,4)}`;
+  const gainTip=`Bruto ${(grossGain>0?"+":"")+money(grossGain,4)} · comisión: −${feeMoney(feeShare)} · neto ${(netGain>0?"+":"")+money(netGain,4)}`;
   $("who").textContent=u.username||"";
   $("kpis").innerHTML =
-    `<div class="kpi kpi-valor"><div class="lab">Valor actual</div><div class="val">${money(a.valor)}</div><div class="sub">Capital disponible <b>${money(a.disponible)}</b></div><div class="kpi-chart" id="chart"></div></div>`+
+    `<div class="kpi kpi-valor"><div class="lab">Valor actual</div><div class="val" title="${valueTip}">${money(a.valor)}</div><div class="sub" title="${valueTip}">Máximo retirable <b>${money(maxWithdraw)}</b> · comisión ${fmt(feePct,0)}% incluida</div><div class="kpi-chart" id="chart"></div></div>`+
     `<div class="kpi"><div class="lab">Aportado</div><div class="val">${money(a.aportado)}</div><div class="sub">${d.wallet?"wallet "+addr(d.wallet):"sin wallet vinculada"}</div></div>`+
-    `<div class="kpi"><div class="lab">Ganado</div><div class="val ${cls(a.ganado)}">${(a.ganado>0?"+":"")+money(a.ganado)}</div><div class="sub"><b class="${cls(a.roi)}">${pct(a.roi)}</b> · ${opDays} ${opDays===1?"día":"días"} · ${pct(roiDaily,3)}/día</div></div>`;
+    `<div class="kpi"><div class="lab">Ganado neto</div><div class="val ${cls(a.ganado)}" title="${gainTip}">${(a.ganado>0?"+":"")+money(a.ganado)}</div><div class="sub"><b class="${cls(a.roi)}">${pct(a.roi)}</b> · comisión incluida · ${opDays} ${opDays===1?"día":"días"} · ${pct(roiDaily,3)}/día</div></div>`;
   const share=+a.parte||0, open=a.open_positions||d.open_positions||[];
   LAST=d;
   const signed=v=>(v==null||isNaN(v))?"—":((v>0?"+":"")+money(v));
@@ -410,8 +419,9 @@ function render(d){
     $("qrImg").removeAttribute("src");
   }
   if(!$("wTo").value && d.wallet) $("wTo").value=d.wallet;
-  $("wAvail").innerHTML = (a.disponible!=null)
-    ? `Disponible ahora: <b>${money(a.disponible)}</b> <span class="muted">(caja libre del fondo: ${money(a.free_cash)}; tu valor total: ${money(a.valor)})</span>`
+  $("wAmount").max = maxWithdraw > 0 ? String(maxWithdraw) : "";
+  $("wAvail").innerHTML = (maxWithdraw!=null)
+    ? `Máximo retirable ahora: <b>${money(maxWithdraw)}</b> <span class="muted">(valor neto ${money(a.valor)} · caja libre del fondo ${money(a.free_cash)} · comisión ${fmt(feePct,0)}% ya incluida)</span>`
     : "";
   const deps=d.contributions||d.deposits||[];
   $("depTag").textContent=deps.length?("· "+deps.length):"";
@@ -502,7 +512,11 @@ $("tabMine").addEventListener("click",()=>{OPS_TAB="mine";renderOps();});
 
 $("btnWithdraw").addEventListener("click",async()=>{
   const amount=+$("wAmount").value||0, to=$("wTo").value.trim();
+  const maxWithdraw=+$("wAmount").max||0;
   if(!(amount>0)||!to){ $("wMsg").textContent="importe y destino obligatorios"; return; }
+  if(maxWithdraw>0 && amount>maxWithdraw+0.001){
+    $("wMsg").textContent=`máximo retirable ${money(maxWithdraw)} (comisión incluida)`; return;
+  }
   if(!confirm(`Solicitar retirada de ${money(amount)} a ${to}?`)) return;
   try{
     await api("/api/portal/withdraw",{method:"POST",body:{amount,to}});
