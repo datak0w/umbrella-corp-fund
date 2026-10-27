@@ -381,28 +381,22 @@ function render(d){
   opDays=Math.max(1,opDays||1);
   const roiDaily=(+a.roi||0)/opDays;
   const feePct=(a.fee_rate!=null?+a.fee_rate:0.25)*100;
-  const grossValue=(a.gross_value!=null?+a.gross_value:+a.valor||0);
   const feeShare=+(a.fee_share||0);
-  const grossGain=(a.gross_gain!=null?+a.gross_gain:+a.ganado||0);
-  const netGain=(a.net_gain!=null?+a.net_gain:+a.ganado||0);
   const maxWithdraw=(a.max_withdraw!=null?+a.max_withdraw:+a.disponible||0);
-  const valueTip=`Bruto ${money(grossValue,4)} · comisión ${fmt(feePct,0)}%: −${feeMoney(feeShare)} · neto ${money(a.valor,4)}`;
-  const gainTip=`Bruto ${(grossGain>0?"+":"")+money(grossGain,4)} · comisión: −${feeMoney(feeShare)} · neto ${(netGain>0?"+":"")+money(netGain,4)}`;
   $("who").textContent=u.username||"";
   $("kpis").innerHTML =
-    `<div class="kpi kpi-valor"><div class="lab">Valor actual</div><div class="val" title="${valueTip}">${money(a.valor)}</div><div class="sub" title="${valueTip}">Máximo retirable <b>${money(maxWithdraw)}</b> · comisión ${fmt(feePct,0)}% incluida</div><div class="kpi-chart" id="chart"></div></div>`+
+    `<div class="kpi kpi-valor"><div class="lab">Valor actual</div><div class="val">${money(a.valor)}</div><div class="sub">Máximo retirable <b>${money(maxWithdraw)}</b> · comisión ${fmt(feePct,0)}% incluida</div><div class="kpi-chart" id="chart"></div></div>`+
     `<div class="kpi"><div class="lab">Aportado</div><div class="val">${money(a.aportado)}</div><div class="sub">${d.wallet?"wallet "+addr(d.wallet):"sin wallet vinculada"}</div></div>`+
-    `<div class="kpi"><div class="lab">Ganado neto</div><div class="val ${cls(a.ganado)}" title="${gainTip}">${(a.ganado>0?"+":"")+money(a.ganado)}</div><div class="sub"><b class="${cls(a.roi)}">${pct(a.roi)}</b> · comisión incluida · ${opDays} ${opDays===1?"día":"días"} · ${pct(roiDaily,3)}/día</div></div>`;
+    `<div class="kpi"><div class="lab">Ganado neto</div><div class="val ${cls(a.ganado)}">${(a.ganado>0?"+":"")+money(a.ganado)}</div><div class="sub"><b class="${cls(a.roi)}">${pct(a.roi)}</b> · comisión incluida · ${opDays} ${opDays===1?"día":"días"} · ${pct(roiDaily,3)}/día</div></div>`;
   const share=+a.parte||0, open=a.open_positions||d.open_positions||[];
   LAST=d;
   const signed=v=>(v==null||isNaN(v))?"—":((v>0?"+":"")+money(v));
   $("openTag").textContent=open.length?("· "+open.length):"";
-  document.querySelector("#openT thead").innerHTML=`<tr><th>Día</th><th>Ciudad</th><th>Entrada</th><th class="r">Shares</th><th class="r">Coste</th><th class="r">Valor</th><th class="r">PnL abierto</th><th class="r">Si gana</th></tr>`;
+  document.querySelector("#openT thead").innerHTML=`<tr><th>Día</th><th>Ciudad</th><th>Entrada</th><th class="r">Shares</th><th class="r">Coste</th><th class="r">Valor</th><th class="r">PnL neto</th></tr>`;
   document.querySelector("#openT tbody").innerHTML=open.length?open.map(x=>`
     <tr><td class="muted">${esc(String(x.day||"").slice(0,10))}</td><td>${esc(x.city_name||x.city||"—")}</td>
       <td>${esc(x.entry||"—")}</td><td class="r">${fmt(x.shares,4)}</td><td class="r">${money(x.cost)}</td>
-      <td class="r">${money(x.value)}</td><td class="r ${cls(x.pnl)}">${signed(x.pnl)}</td>
-      <td class="r ${cls(x.expected)}">${signed(x.expected)}</td></tr>`).join("")
+      <td class="r">${money(x.value)}</td><td class="r ${cls(x.pnl_net!=null?x.pnl_net:x.pnl)}">${signed(x.pnl_net!=null?x.pnl_net:x.pnl)}</td></tr>`).join("")
     :`<tr><td colspan="8" class="muted" style="padding:14px">sin posiciones abiertas del fondo</td></tr>`;
   $("chart").innerHTML=chart(hist,share);
   renderOps();
@@ -457,21 +451,19 @@ function renderOps(){
   const open=entry?openAll.filter(x=>String(x.day||"")>=entry):openAll;
   const list=mine.slice(0,15);
   const signed=v=>(v==null||isNaN(v))?"—":((v>0?"+":"")+money(v));
-  const closedPnl=mine.reduce((sum,x)=>sum+(+x.pnl||0),0);
-  const openPnl=open.reduce((sum,x)=>sum+(+x.pnl||0),0);
+  const closedPnl=mine.reduce((sum,x)=>sum+(x.pnl_net!=null?+x.pnl_net:+x.pnl||0),0);
+  const openPnl=open.reduce((sum,x)=>sum+(x.pnl_net!=null?+x.pnl_net:+x.pnl||0),0);
   const fee=+(a.fee_share||0);
-  const netOps=closedPnl+openPnl-fee;
-  const accountGain=+(a.ganado||0);
-  const adjust=Math.round((accountGain-netOps)*100)/100;
+  const netOps=closedPnl+openPnl;
   $("opsTag").textContent="· "+list.length;
   $("opsEntryNote").innerHTML=(entry
     ? `Participas en las operaciones desde <b>${esc(entry)}</b>.`
     : "Aún no tienes una fecha de ingreso registrada.")+" · 💰 redimido on-chain";
-  $("opsSummary").innerHTML=`Cerradas <b>${signed(closedPnl)}</b> · Abiertas <b>${signed(openPnl)}</b> · Comisión <b class="neg">−${feeMoney(fee)}</b> · Neto operativa <b class="${cls(netOps)}">${signed(netOps)}</b> · Ajuste valoración/entrada <b class="${cls(adjust)}">${signed(adjust)}</b> · Ganado cuenta <b class="${cls(accountGain)}">${signed(accountGain)}</b> <span class="muted">(comisión incluida)</span>`;
-  document.querySelector("#opsT thead").innerHTML=`<tr><th>Día</th><th>Ciudad</th><th>Entrada</th><th>Ganó</th><th>Resultado</th><th class="r">Coste</th><th class="r">PnL bruto</th><th class="r">ROI</th></tr>`;
+  $("opsSummary").innerHTML=`Cerradas <b>${signed(closedPnl)}</b> · Abiertas <b>${signed(openPnl)}</b> · Total neto <b class="${cls(netOps)}">${signed(netOps)}</b> <span class="muted">(comisión 25% ya incluida: −${feeMoney(fee)})</span>`;
+  document.querySelector("#opsT thead").innerHTML=`<tr><th>Día</th><th>Ciudad</th><th>Entrada</th><th>Ganó</th><th>Resultado</th><th class="r">Coste</th><th class="r">PnL neto</th><th class="r">ROI</th></tr>`;
   document.querySelector("#opsT tbody").innerHTML=list.length?list.map(x=>{
     const cost=x.cost;
-    const pnl=x.pnl;
+    const pnl=(x.pnl_net!=null?x.pnl_net:x.pnl);
     const res=x.open?'<span class="pill">abierta</span>':pnl>0?'<span class="pill win">ganada</span>':pnl<0?'<span class="pill loss">perdida</span>':'<span class="pill">plana</span>';
     const bag=x.redeemed?' <span class="pill" title="Redimido on-chain: CTF/PositionManager a 0">💰</span>':'';
     return `<tr><td class="muted">${esc(String(x.day||"").slice(0,10))}</td><td>${esc(x.city_name||x.city||"—")}</td>
