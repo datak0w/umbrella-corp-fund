@@ -455,11 +455,13 @@ function renderOps(){
   const openPnl=open.reduce((sum,x)=>sum+(x.pnl_net!=null?+x.pnl_net:+x.pnl||0),0);
   const fee=+(a.fee_share||0);
   const netOps=closedPnl+openPnl;
+  const accountGain=+(a.ganado||0);
+  const adjust=Math.round((accountGain-netOps)*100)/100;
   $("opsTag").textContent="· "+list.length;
   $("opsEntryNote").innerHTML=(entry
     ? `Participas en las operaciones desde <b>${esc(entry)}</b>.`
     : "Aún no tienes una fecha de ingreso registrada.")+" · 💰 redimido on-chain";
-  $("opsSummary").innerHTML=`Cerradas <b>${signed(closedPnl)}</b> · Abiertas <b>${signed(openPnl)}</b> · Total neto <b class="${cls(netOps)}">${signed(netOps)}</b> <span class="muted">(comisión 25% ya incluida: −${feeMoney(fee)})</span>`;
+  $("opsSummary").innerHTML=`Cerradas <b>${signed(closedPnl)}</b> · Abiertas <b>${signed(openPnl)}</b> · Total neto <b class="${cls(netOps)}">${signed(netOps)}</b> · Ajuste valoración <b class="${cls(adjust)}">${signed(adjust)}</b> · Ganado neto cuenta <b class="${cls(accountGain)}">${signed(accountGain)}</b> <span class="muted">(comisión 25% ya incluida: −${feeMoney(fee)})</span>`;
   document.querySelector("#opsT thead").innerHTML=`<tr><th>Día</th><th>Ciudad</th><th>Entrada</th><th>Ganó</th><th>Resultado</th><th class="r">Coste</th><th class="r">PnL neto</th><th class="r">ROI</th></tr>`;
   document.querySelector("#opsT tbody").innerHTML=list.length?list.map(x=>{
     const cost=x.cost;
