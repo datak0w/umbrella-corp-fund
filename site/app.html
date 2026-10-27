@@ -157,13 +157,10 @@ footer{max-width:1100px;margin:0 auto;padding:10px 20px 30px;color:var(--dim);fo
     <section class="panel"><h2>Posiciones abiertas <span class="tag" id="openTag"></span></h2>
       <div class="scroll"><table id="openT"><thead></thead><tbody></tbody></table></div></section>
 
-    <section class="panel"><h2>Operaciones <span class="tag" id="opsTag"></span></h2>
-      <div class="subtabs" role="tablist">
-        <button id="tabFund" type="button" class="on" role="tab" aria-selected="true">Fondo</button>
-        <button id="tabMine" type="button" role="tab" aria-selected="false">Mi operativa</button>
-      </div>
+    <section class="panel"><h2>Operaciones cerradas <span class="tag" id="opsTag"></span></h2>
       <div class="muted small" id="opsEntryNote" style="padding:10px 16px 0"></div>
-      <div class="scroll"><table id="opsT"><thead></thead><tbody></tbody></table></div></section>
+      <div class="scroll"><table id="opsT"><thead></thead><tbody></tbody></table></div>
+      <div class="pad muted small" id="opsSummary"></div></section>
 
     <div class="grid2">
       <section class="panel"><h2>Depositar</h2><div class="pad">
@@ -258,7 +255,7 @@ const feeMoney=v=>(v===null||v===undefined||isNaN(v))?"—":fmt(v,6)+" $";
 const pct=(v,d=2)=>(v===null||v===undefined||isNaN(v))?"—":((v>0?"+":"")+fmt(v,d)+"%");
 const cls=v=>(v===null||v===undefined||v===0)?"flat":(v>0?"pos":"neg");
 const addr=a=>a?(a.slice(0,6)+"…"+a.slice(-4)):"—";
-let API="", ST=null, TIMER=null, ME=null, LAST=null, OPS_TAB="fund";
+let API="", ST=null, TIMER=null, ME=null, LAST=null;
 
 function applyTheme(t){document.documentElement.dataset.theme=t;$("btnTheme").textContent=t==="dark"?"☾":"☀";}
 try{applyTheme(localStorage.getItem("fund_theme")||"dark");}catch(e){applyTheme("dark");}
@@ -456,27 +453,31 @@ function renderOps(){
   const d=LAST||{}, a=d.account||{}, all=a.operations||d.operations||[];
   const entry=String(a.entry_date||"");
   const mine=entry?all.filter(x=>String(x.day||"")>=entry):[];
-  const list=(OPS_TAB==="mine"?mine:all).slice(0,15);
+  const openAll=a.open_positions||d.open_positions||[];
+  const open=entry?openAll.filter(x=>String(x.day||"")>=entry):openAll;
+  const list=mine.slice(0,15);
   const signed=v=>(v==null||isNaN(v))?"—":((v>0?"+":"")+money(v));
-  $("tabFund").classList.toggle("on",OPS_TAB==="fund");
-  $("tabMine").classList.toggle("on",OPS_TAB==="mine");
-  $("tabFund").setAttribute("aria-selected",OPS_TAB==="fund"?"true":"false");
-  $("tabMine").setAttribute("aria-selected",OPS_TAB==="mine"?"true":"false");
+  const closedPnl=mine.reduce((sum,x)=>sum+(+x.pnl||0),0);
+  const openPnl=open.reduce((sum,x)=>sum+(+x.pnl||0),0);
+  const fee=+(a.fee_share||0);
+  const netOps=closedPnl+openPnl-fee;
+  const accountGain=+(a.ganado||0);
+  const adjust=Math.round((accountGain-netOps)*100)/100;
   $("opsTag").textContent="· "+list.length;
-  $("opsEntryNote").innerHTML=(OPS_TAB==="mine"
-    ? (entry?`Participas en las operaciones desde <b>${esc(entry)}</b>.`:"Aún no tienes una fecha de ingreso registrada.")
-    : "Últimas 15 operaciones del fondo.")+" · 💰 redimido on-chain";
-  const fundTab=OPS_TAB==="fund";
-  document.querySelector("#opsT thead").innerHTML=`<tr><th>Día</th><th>Ciudad</th><th>Entrada</th><th>Ganó</th><th>Resultado</th><th class="r">Coste</th><th class="r">PnL</th><th class="r">ROI</th></tr>`;
+  $("opsEntryNote").innerHTML=(entry
+    ? `Participas en las operaciones desde <b>${esc(entry)}</b>.`
+    : "Aún no tienes una fecha de ingreso registrada.")+" · 💰 redimido on-chain";
+  $("opsSummary").innerHTML=`Cerradas <b>${signed(closedPnl)}</b> · Abiertas <b>${signed(openPnl)}</b> · Comisión <b class="neg">−${feeMoney(fee)}</b> · Neto operativa <b class="${cls(netOps)}">${signed(netOps)}</b> · Ajuste valoración/entrada <b class="${cls(adjust)}">${signed(adjust)}</b> · Ganado cuenta <b class="${cls(accountGain)}">${signed(accountGain)}</b> <span class="muted">(comisión incluida)</span>`;
+  document.querySelector("#opsT thead").innerHTML=`<tr><th>Día</th><th>Ciudad</th><th>Entrada</th><th>Ganó</th><th>Resultado</th><th class="r">Coste</th><th class="r">PnL bruto</th><th class="r">ROI</th></tr>`;
   document.querySelector("#opsT tbody").innerHTML=list.length?list.map(x=>{
-    const cost=fundTab?x.cost_fund:x.cost;
-    const pnl=fundTab?x.pnl_fund:x.pnl;
+    const cost=x.cost;
+    const pnl=x.pnl;
     const res=x.open?'<span class="pill">abierta</span>':pnl>0?'<span class="pill win">ganada</span>':pnl<0?'<span class="pill loss">perdida</span>':'<span class="pill">plana</span>';
     const bag=x.redeemed?' <span class="pill" title="Redimido on-chain: CTF/PositionManager a 0">💰</span>':'';
     return `<tr><td class="muted">${esc(String(x.day||"").slice(0,10))}</td><td>${esc(x.city_name||x.city||"—")}</td>
       <td>${esc(x.entry||"—")}</td><td>${esc(x.winner||"—")}</td><td>${res}${bag}</td><td class="r">${money(cost)}</td>
       <td class="r ${cls(pnl)}">${signed(pnl)}</td><td class="r ${cls(x.roi)}">${pct(x.roi,1)}</td></tr>`;
-  }).join(""):`<tr><td colspan="8" class="muted" style="padding:14px">${OPS_TAB==="mine"?"aún no hay operaciones desde tu ingreso":"sin operaciones del fondo"}</td></tr>`;
+  }).join(""):`<tr><td colspan="8" class="muted" style="padding:14px">aún no hay operaciones desde tu ingreso</td></tr>`;
 }
 
 async function bindWallet(){
@@ -507,8 +508,6 @@ document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{ i
 document.addEventListener("keydown",e=>{ if(e.key==="Escape") document.querySelectorAll(".modal:not([hidden])").forEach(m=>closeModal(m.id)); });
 $("btnQr").addEventListener("click",()=>openModal("qrModal"));
 $("btnUsdcInfo").addEventListener("click",()=>openModal("usdcModal"));
-$("tabFund").addEventListener("click",()=>{OPS_TAB="fund";renderOps();});
-$("tabMine").addEventListener("click",()=>{OPS_TAB="mine";renderOps();});
 
 $("btnWithdraw").addEventListener("click",async()=>{
   const amount=+$("wAmount").value||0, to=$("wTo").value.trim();
