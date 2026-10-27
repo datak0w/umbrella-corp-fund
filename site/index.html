@@ -453,17 +453,18 @@ function renderOps(){
   $("tabFund").setAttribute("aria-selected",OPS_TAB==="fund"?"true":"false");
   $("tabMine").setAttribute("aria-selected",OPS_TAB==="mine"?"true":"false");
   $("opsTag").textContent="· "+list.length;
-  $("opsEntryNote").innerHTML=OPS_TAB==="mine"
+  $("opsEntryNote").innerHTML=(OPS_TAB==="mine"
     ? (entry?`Participas en las operaciones desde <b>${esc(entry)}</b>.`:"Aún no tienes una fecha de ingreso registrada.")
-    : "Últimas 15 operaciones del fondo.";
+    : "Últimas 15 operaciones del fondo.")+" · 💰 redimido on-chain";
   const fundTab=OPS_TAB==="fund";
   document.querySelector("#opsT thead").innerHTML=`<tr><th>Día</th><th>Ciudad</th><th>Entrada</th><th>Ganó</th><th>Resultado</th><th class="r">Coste</th><th class="r">PnL</th><th class="r">ROI</th></tr>`;
   document.querySelector("#opsT tbody").innerHTML=list.length?list.map(x=>{
     const cost=fundTab?x.cost_fund:x.cost;
     const pnl=fundTab?x.pnl_fund:x.pnl;
     const res=x.open?'<span class="pill">abierta</span>':pnl>0?'<span class="pill win">ganada</span>':pnl<0?'<span class="pill loss">perdida</span>':'<span class="pill">plana</span>';
+    const bag=x.redeemed?' <span class="pill" title="Redimido on-chain: CTF/PositionManager a 0">💰</span>':'';
     return `<tr><td class="muted">${esc(String(x.day||"").slice(0,10))}</td><td>${esc(x.city_name||x.city||"—")}</td>
-      <td>${esc(x.entry||"—")}</td><td>${esc(x.winner||"—")}</td><td>${res}</td><td class="r">${money(cost)}</td>
+      <td>${esc(x.entry||"—")}</td><td>${esc(x.winner||"—")}</td><td>${res}${bag}</td><td class="r">${money(cost)}</td>
       <td class="r ${cls(pnl)}">${signed(pnl)}</td><td class="r ${cls(x.roi)}">${pct(x.roi,1)}</td></tr>`;
   }).join(""):`<tr><td colspan="8" class="muted" style="padding:14px">${OPS_TAB==="mine"?"aún no hay operaciones desde tu ingreso":"sin operaciones del fondo"}</td></tr>`;
 }
